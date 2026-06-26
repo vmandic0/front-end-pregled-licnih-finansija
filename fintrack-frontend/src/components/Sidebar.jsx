@@ -1,9 +1,10 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 import {
   LayoutDashboard, ArrowLeftRight, Tag, Sliders,
   CreditCard, FileText, Users, BarChart2,
-  Globe, LogOut, Star, PiggyBank
+  Globe, LogOut, Star, PiggyBank, Sun, Moon
 } from 'lucide-react'
 
 const navItem = 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all'
@@ -11,6 +12,7 @@ const activeItem = 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-wh
 
 export default function Sidebar() {
   const { user, logout, isPremium, isAdmin } = useAuth()
+  const { dark, toggleTema } = useTheme()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -19,7 +21,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-52 bg-[#1e293b] border-r border-white/5 flex flex-col py-6 px-3">
+    <aside className="fixed top-0 left-0 h-screen w-52 bg-[var(--bg-card)] border-r border-white/5 flex flex-col py-6 px-3">
       {/* Logo */}
       <div className="flex items-center gap-2 px-3 mb-8">
         <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center">
@@ -89,6 +91,15 @@ export default function Sidebar() {
 
       {/* User info + logout */}
       <div className="mt-auto">
+        {/* Dark/Light toggle */}
+        <button
+          onClick={toggleTema}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all mb-2"
+        >
+          {dark ? <Sun size={16} /> : <Moon size={16} />}
+          {dark ? 'Light mode' : 'Dark mode'}
+        </button>
+
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 mb-2">
           <div className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center text-xs font-bold text-white">
             {user?.name?.charAt(0).toUpperCase()}

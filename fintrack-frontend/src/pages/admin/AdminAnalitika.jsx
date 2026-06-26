@@ -34,7 +34,7 @@ export default function AdminAnalitika() {
       <h1 className="text-white text-2xl font-bold mb-6">Analitika</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-white font-medium mb-4">Transakcije po mesecima</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={mesecniData}>
@@ -46,7 +46,7 @@ export default function AdminAnalitika() {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-white font-medium mb-4">Transakcije po kategorijama</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={katData} layout="vertical">

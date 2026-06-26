@@ -29,7 +29,7 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex">
       {/* Leva strana */}
       <div className="hidden lg:flex w-1/2 flex-col items-center justify-center p-12 border-r border-white/5">
         <div className="w-16 h-16 rounded-2xl bg-amber-500 flex items-center justify-center mb-6">

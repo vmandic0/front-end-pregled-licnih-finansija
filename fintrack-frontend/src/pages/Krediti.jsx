@@ -52,15 +52,15 @@ export default function Krediti() {
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupan dug</p>
           <p className="text-red-400 text-2xl font-bold">{ukupanDug.toLocaleString()} RSD</p>
         </div>
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Broj kredita</p>
           <p className="text-white text-2xl font-bold">{krediti.length}</p>
         </div>
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Mes. obaveza</p>
           <p className="text-white text-2xl font-bold">{mesecnaObaveza.toLocaleString()} RSD</p>
         </div>
@@ -73,7 +73,7 @@ export default function Krediti() {
           const meseci = k.meseci_do_otplate || Math.ceil(ukupno / parseFloat(k.mesecnaRata))
           const otplaceno = Math.max(0, 100 - (meseci / (ukupno / parseFloat(k.mesecnaRata))) * 100)
           return (
-            <div key={k.id} className="bg-[#1e293b] border border-white/5 rounded-xl p-5">
+            <div key={k.id} className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center">
@@ -118,7 +118,7 @@ export default function Krediti() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#1e293b] border border-white/10 rounded-xl p-6 w-full max-w-md">
+          <div className="bg-[var(--bg-card)] border border-white/10 rounded-xl p-6 w-full max-w-md">
             <h2 className="text-white font-semibold mb-4">{editKredit ? 'Izmeni ratu' : 'Dodaj kredit'}</h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {!editKredit && (

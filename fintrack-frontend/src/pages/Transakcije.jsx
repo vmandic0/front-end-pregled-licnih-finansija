@@ -84,22 +84,22 @@ export default function Transakcije() {
 
       {/* Stat kartice */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupno transakcija</p>
           <p className="text-white text-2xl font-bold">{transakcije.length}</p>
         </div>
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Prihodi</p>
           <p className="text-green-400 text-2xl font-bold">{konvertuj(prihodi)} {valuta}</p>
         </div>
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Troškovi</p>
           <p className="text-red-400 text-2xl font-bold">{konvertuj(troskovi)} {valuta}</p>
         </div>
       </div>
 
       {/* Filteri */}
-      <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4 mb-4">
+      <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4 mb-4">
         <div className="flex gap-3">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -122,7 +122,7 @@ export default function Transakcije() {
       </div>
 
       {/* Tabela */}
-      <div className="bg-[#1e293b] border border-white/5 rounded-xl overflow-hidden">
+      <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/5">
@@ -168,7 +168,7 @@ export default function Transakcije() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#1e293b] border border-white/10 rounded-xl p-6 w-full max-w-md">
+          <div className="bg-[var(--bg-card)] border border-white/10 rounded-xl p-6 w-full max-w-md">
             <h2 className="text-white font-semibold mb-4">Nova transakcija</h2>
             <form onSubmit={handleDodaj} className="flex flex-col gap-4">
               <div>

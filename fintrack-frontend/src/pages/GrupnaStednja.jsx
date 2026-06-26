@@ -57,15 +57,15 @@ export default function GrupnaStednja() {
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Aktivne grupe</p>
           <p className="text-white text-2xl font-bold">{grupe.length}</p>
         </div>
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupno prikupljeno</p>
           <p className="text-amber-400 text-2xl font-bold">{ukupnoPrikupljeno.toLocaleString()} RSD</p>
         </div>
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupni cilj</p>
           <p className="text-white text-2xl font-bold">{ukupniCilj.toLocaleString()} RSD</p>
         </div>
@@ -76,7 +76,7 @@ export default function GrupnaStednja() {
         {grupe.map(g => {
           const procenat = Math.min((parseFloat(g.trenutnoPrikupljeno) / parseFloat(g.ciljIznos)) * 100, 100)
           return (
-            <div key={g.id} className="bg-[#1e293b] border border-white/5 rounded-xl p-5">
+            <div key={g.id} className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-5">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-white font-medium">{g.naziv}</p>
                 <div className="flex items-center gap-3">
@@ -104,7 +104,7 @@ export default function GrupnaStednja() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#1e293b] border border-white/10 rounded-xl p-6 w-full max-w-md">
+          <div className="bg-[var(--bg-card)] border border-white/10 rounded-xl p-6 w-full max-w-md">
             <h2 className="text-white font-semibold mb-4">Nova grupa</h2>
             <form onSubmit={handleKreiraj} className="flex flex-col gap-4">
               <div>
@@ -133,7 +133,7 @@ export default function GrupnaStednja() {
 
       {showUplataModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#1e293b] border border-white/10 rounded-xl p-6 w-full max-w-md">
+          <div className="bg-[var(--bg-card)] border border-white/10 rounded-xl p-6 w-full max-w-md">
             <h2 className="text-white font-semibold mb-1">Uplata udela</h2>
             <p className="text-slate-400 text-sm mb-4">{selectedGrupa?.naziv}</p>
             <form onSubmit={handleUplata} className="flex flex-col gap-4">

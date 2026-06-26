@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import api from '../api/axios'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { Download } from 'lucide-react'
@@ -15,18 +15,22 @@ export default function Izvestaji() {
     try {
       const params = tip === 'mesecni' ? { mesec, godina } : { godina }
       const res = await api.get(`/izvestaj/${tip}`, { params })
+      console.log(`Podaci za [${tip}]:`, res.data)
       setPodaci(res.data)
-    } catch {}
+    } catch (err) {
+      console.error('Greška pri dobavljanju izveštaja', err)
+    }
     setLoading(false)
   }
+
+  useEffect(() => {
+    fetchIzvestaj()
+  }, [tip, mesec, godina])
 
   const exportCSV = async () => {
     const params = tip === 'mesecni' ? { mesec, godina } : { godina }
     try {
-      const res = await api.get(`/izvestaj/${tip}/csv`, {
-        params,
-        responseType: 'blob'
-      })
+      const res = await api.get(`/izvestaj/${tip}/csv`, { params, responseType: 'blob' })
       const url = window.URL.createObjectURL(new Blob([res.data]))
       const a = document.createElement('a')
       a.href = url
@@ -41,10 +45,7 @@ export default function Izvestaji() {
   const exportPDF = async () => {
     const params = tip === 'mesecni' ? { mesec, godina } : { godina }
     try {
-      const res = await api.get(`/izvestaj/${tip}/pdf`, {
-        params,
-        responseType: 'blob'
-      })
+      const res = await api.get(`/izvestaj/${tip}/pdf`, { params, responseType: 'blob' })
       const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
       const a = document.createElement('a')
       a.href = url
@@ -56,13 +57,58 @@ export default function Izvestaji() {
     }
   }
 
-  const chartData = podaci?.po_mesecima
-    ? Object.entries(podaci.po_mesecima).map(([key, val]) => ({
-        name: key, Prihodi: val.prihodi, Troškovi: val.troskovi
-      }))
-    : podaci?.transakcije
-      ? [{ name: `${mesec}/${godina}`, Prihodi: podaci.ukupni_prihodi, Troškovi: podaci.ukupni_troskovi }]
-      : []
+  // DETEKCIJA PODATAKA I ZA X OSU I ZA STUBIĆE (Y OSU)
+  const getChartData = () => {
+    if (!podaci) return []
+
+    if (tip === 'godisnji' && Array.isArray(podaci.meseci)) {
+      return podaci.meseci.map((item, index) => {
+        // 1. Određivanje naziva meseca na X osi
+        const brojMeseca = item.mesec || (index + 1)
+        const imeMeseca = new Date(0, brojMeseca - 1).toLocaleString('sr', { month: 'short' })
+        
+        // 2. Skeniranje svih mogućih naziva za PRIHODE unutar elementa
+        const prihodiVrednost = 
+          item.prihodi || 
+          item.prihod || 
+          item.ukupni_prihodi || 
+          item.income || 
+          item.revenue || 
+          item.suma || 
+          0
+
+        // 3. Skeniranje svih mogućih naziva za TROŠKOVE unutar elementa
+        const troskoviVrednost = 
+          item.troskovi || 
+          item.trosak || 
+          item.ukupni_troskovi || 
+          item.expenses || 
+          item.rashodi || 
+          item.rashod || 
+          0
+
+        return {
+          name: imeMeseca,
+          Prihodi: prihodiVrednost,
+          Troškovi: troskoviVrednost
+        }
+      })
+    }
+
+    // Prikaz jedne kolone za Mesečni izveštaj
+    if (tip === 'mesecni') {
+      const mesecIme = new Date(0, Number(mesec) - 1).toLocaleString('sr', { month: 'short' })
+      return [{
+        name: `${mesecIme} ${godina}`,
+        Prihodi: podaci.ukupni_prihodi || 0,
+        Troškovi: podaci.ukupni_troskovi || 0
+      }]
+    }
+
+    return []
+  }
+
+  const chartData = getChartData()
 
   return (
     <div>
@@ -78,7 +124,7 @@ export default function Izvestaji() {
         </div>
       </div>
 
-      <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4 mb-6">
+      <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4 mb-6">
         <div className="flex gap-3 flex-wrap">
           <div className="flex rounded-lg overflow-hidden border border-white/10">
             {['mesecni', 'godisnji'].map(t => (
@@ -88,18 +134,29 @@ export default function Izvestaji() {
               </button>
             ))}
           </div>
+          
           {tip === 'mesecni' && (
-            <select value={mesec} onChange={e => setMesec(e.target.value)}
-              className="bg-white/5 border border-white/10 text-slate-300 px-3 py-2 rounded-lg text-sm outline-none">
+            <select 
+              value={mesec} 
+              onChange={e => setMesec(Number(e.target.value))}
+              className="bg-white/5 border border-white/10 text-slate-300 px-3 py-2 rounded-lg text-sm outline-none"
+            >
               {Array.from({ length: 12 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>{new Date(0, i).toLocaleString('sr', { month: 'long' })}</option>
+                <option key={i + 1} value={i + 1}>
+                  {new Date(0, i).toLocaleString('sr', { month: 'long' })}
+                </option>
               ))}
             </select>
           )}
-          <select value={godina} onChange={e => setGodina(e.target.value)}
-            className="bg-white/5 border border-white/10 text-slate-300 px-3 py-2 rounded-lg text-sm outline-none">
+
+          <select 
+            value={godina} 
+            onChange={e => setGodina(Number(e.target.value))}
+            className="bg-white/5 border border-white/10 text-slate-300 px-3 py-2 rounded-lg text-sm outline-none"
+          >
             {[2024, 2025, 2026].map(g => <option key={g} value={g}>{g}</option>)}
           </select>
+
           <button onClick={fetchIzvestaj} disabled={loading}
             className="bg-amber-500 hover:bg-amber-400 text-white text-sm px-4 py-2 rounded-lg transition disabled:opacity-50">
             {loading ? 'Učitavanje...' : 'Generiši'}
@@ -107,9 +164,11 @@ export default function Izvestaji() {
         </div>
       </div>
 
-      {podaci && (
+      {loading && <div className="text-slate-400 text-sm py-4">Učitavanje podataka...</div>}
+
+      {!loading && podaci && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+          <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
             <p className="text-white font-medium mb-4">Prihodi vs troškovi</p>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={chartData}>
@@ -123,7 +182,7 @@ export default function Izvestaji() {
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+          <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
             <p className="text-white font-medium mb-4">Pregled</p>
             <div className="flex flex-col gap-3">
               <div className="flex justify-between py-3 border-b border-white/5">

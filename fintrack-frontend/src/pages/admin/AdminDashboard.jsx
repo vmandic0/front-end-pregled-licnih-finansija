@@ -32,14 +32,14 @@ export default function AdminDashboard() {
           { label: 'Transakcija', value: stats?.ukupno_transakcija, icon: <ArrowLeftRight size={18} className="text-green-400" /> },
           { label: 'Kategorija', value: stats?.ukupno_kategorija, icon: <Tag size={18} className="text-purple-400" /> },
         ].map(({ label, value, icon }) => (
-          <div key={label} className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+          <div key={label} className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">{icon}<p className="text-slate-500 text-xs">{label}</p></div>
             <p className="text-white text-2xl font-bold">{value ?? '—'}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+      <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
         <div className="flex items-center justify-between mb-4">
           <p className="text-white font-medium">Korisnici</p>
           <Link to="/admin/korisnici" className="text-amber-400 text-sm hover:underline">Svi korisnici →</Link>

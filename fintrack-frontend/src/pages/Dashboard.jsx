@@ -86,20 +86,20 @@ export default function Dashboard() {
       {/* Stat kartice */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {isPremium() && (
-          <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+          <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
             <p className="text-slate-500 text-xs mb-1">Net worth</p>
             <p className="text-white text-2xl font-bold">{konvertuj(data?.net_worth || 0)} {valuta}</p>
           </div>
         )}
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupni prihodi</p>
           <p className="text-green-400 text-2xl font-bold">{konvertuj(prihodi)} {valuta}</p>
         </div>
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupni troškovi</p>
           <p className="text-red-400 text-2xl font-bold">{konvertuj(troskovi)} {valuta}</p>
         </div>
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Bilans meseca</p>
           <p className={`text-2xl font-bold ${bilans >= 0 ? 'text-white' : 'text-red-400'}`}>{konvertuj(bilans)} {valuta}</p>
           <p className="text-slate-500 text-xs mt-1">{bilans >= 0 ? 'Pozitivan bilans' : 'Negativan bilans'}</p>
@@ -108,7 +108,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Poslednje transakcije */}
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-white font-medium mb-4">Poslednje transakcije</p>
           <div className="flex flex-col gap-3">
             {poslednje.length === 0 && <p className="text-slate-500 text-sm">Nema transakcija</p>}
@@ -132,7 +132,7 @@ export default function Dashboard() {
         </div>
 
         {/* Limiti */}
-        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-white font-medium mb-4">Limiti</p>
           <div className="flex flex-col gap-4">
             {limiti.length === 0 && <p className="text-slate-500 text-sm">Nema postavljenih limita</p>}
