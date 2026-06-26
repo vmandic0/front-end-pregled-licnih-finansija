@@ -11,17 +11,33 @@ export default function Transakcije() {
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ kategorija_id: '', kolicina: '', datum: '' })
   const [poruka, setPoruka] = useState('')
+  const [kurs, setKurs] = useState(1)
+  const [valuta, setValuta] = useState('RSD')
 
   useEffect(() => { fetchAll() }, [])
 
   const fetchAll = async () => {
     try {
-      const [tRes, kRes] = await Promise.all([api.get('/transakcije'), api.get('/kategorije')])
+      const [tRes, kRes, pRes] = await Promise.all([
+        api.get('/transakcije'),
+        api.get('/kategorije'),
+        api.get('/profil'),
+      ])
       setTransakcije(tRes.data.data || tRes.data)
       setKategorije(kRes.data.data || kRes.data)
+
+      const prefValuta = pRes.data.preferred_currency || 'RSD'
+      setValuta(prefValuta)
+
+      if (prefValuta !== 'RSD') {
+        const kursRes = await api.post('/konvertuj', { iznos: 1, iz_valute: 'RSD', u_valutu: prefValuta })
+        setKurs(kursRes.data.konvertovani_iznos)
+      }
     } catch {}
     setLoading(false)
   }
+
+  const konvertuj = (iznos) => (iznos * kurs).toLocaleString(undefined, { maximumFractionDigits: 2 })
 
   const handleDodaj = async (e) => {
     e.preventDefault()
@@ -31,7 +47,7 @@ export default function Transakcije() {
       setShowModal(false)
       setForm({ kategorija_id: '', kolicina: '', datum: '' })
       fetchAll()
-    } catch (err) {
+    } catch {
       setPoruka('Greška pri dodavanju.')
     }
   }
@@ -68,22 +84,22 @@ export default function Transakcije() {
 
       {/* Stat kartice */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupno transakcija</p>
           <p className="text-white text-2xl font-bold">{transakcije.length}</p>
         </div>
-        <div className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Prihodi</p>
-          <p className="text-green-400 text-2xl font-bold">{prihodi.toLocaleString()} RSD</p>
+          <p className="text-green-400 text-2xl font-bold">{konvertuj(prihodi)} {valuta}</p>
         </div>
-        <div className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Troškovi</p>
-          <p className="text-red-400 text-2xl font-bold">{troskovi.toLocaleString()} RSD</p>
+          <p className="text-red-400 text-2xl font-bold">{konvertuj(troskovi)} {valuta}</p>
         </div>
       </div>
 
       {/* Filteri */}
-      <div className="bg-[#13141a] border border-white/5 rounded-xl p-4 mb-4">
+      <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4 mb-4">
         <div className="flex gap-3">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -106,7 +122,7 @@ export default function Transakcije() {
       </div>
 
       {/* Tabela */}
-      <div className="bg-[#13141a] border border-white/5 rounded-xl overflow-hidden">
+      <div className="bg-[#1e293b] border border-white/5 rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/5">
@@ -114,7 +130,7 @@ export default function Transakcije() {
               <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">KATEGORIJA</th>
               <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">DATUM</th>
               <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">TIP</th>
-              <th className="text-right text-slate-500 text-xs font-medium px-4 py-3">IZNOS</th>
+              <th className="text-right text-slate-500 text-xs font-medium px-4 py-3">IZNOS ({valuta})</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
@@ -136,7 +152,7 @@ export default function Transakcije() {
                   </span>
                 </td>
                 <td className={`px-4 py-3 text-sm font-medium text-right ${t.kategorija?.tip === 'prihod' ? 'text-green-400' : 'text-red-400'}`}>
-                  {t.kategorija?.tip === 'prihod' ? '+' : '-'}{parseFloat(t.kolicina).toLocaleString()} RSD
+                  {t.kategorija?.tip === 'prihod' ? '+' : '-'}{konvertuj(parseFloat(t.kolicina))}
                 </td>
                 <td className="px-4 py-3">
                   <button onClick={() => handleObrisi(t.id)} className="text-slate-600 hover:text-red-400 transition">
@@ -152,7 +168,7 @@ export default function Transakcije() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#13141a] border border-white/10 rounded-xl p-6 w-full max-w-md">
+          <div className="bg-[#1e293b] border border-white/10 rounded-xl p-6 w-full max-w-md">
             <h2 className="text-white font-semibold mb-4">Nova transakcija</h2>
             <form onSubmit={handleDodaj} className="flex flex-col gap-4">
               <div>

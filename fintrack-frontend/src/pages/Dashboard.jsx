@@ -1,25 +1,38 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { Plus, TrendingUp, TrendingDown, Wallet, BarChart3 } from 'lucide-react'
+import { Plus, TrendingUp, TrendingDown, Star, Trophy } from 'lucide-react'
 import api from '../api/axios'
 import { Link } from 'react-router-dom'
 
 export default function Dashboard() {
   const { user, isPremium } = useAuth()
   const [data, setData] = useState(null)
+  const [profil, setProfil] = useState(null)
   const [transakcije, setTransakcije] = useState([])
   const [limiti, setLimiti] = useState([])
+  const [kurs, setKurs] = useState(1)
+  const [valuta, setValuta] = useState('RSD')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [tRes, lRes] = await Promise.all([
+        const [tRes, lRes, pRes] = await Promise.all([
           api.get('/transakcije'),
           api.get('/limiti'),
+          api.get('/profil'),
         ])
         setTransakcije(tRes.data.data || tRes.data)
         setLimiti(lRes.data.data || lRes.data)
+        setProfil(pRes.data)
+
+        const prefValuta = pRes.data.preferred_currency || 'RSD'
+        setValuta(prefValuta)
+
+        if (prefValuta !== 'RSD') {
+          const kursRes = await api.post('/konvertuj', { iznos: 1, iz_valute: 'RSD', u_valutu: prefValuta })
+          setKurs(kursRes.data.konvertovani_iznos)
+        }
 
         if (isPremium()) {
           const nwRes = await api.get('/net-worth')
@@ -31,6 +44,8 @@ export default function Dashboard() {
     fetchAll()
   }, [])
 
+  const konvertuj = (iznos) => (iznos * kurs).toLocaleString(undefined, { maximumFractionDigits: 2 })
+
   const prihodi = transakcije.filter(t => t.kategorija?.tip === 'prihod').reduce((s, t) => s + parseFloat(t.kolicina), 0)
   const troskovi = transakcije.filter(t => t.kategorija?.tip === 'trosak').reduce((s, t) => s + parseFloat(t.kolicina), 0)
   const bilans = prihodi - troskovi
@@ -41,7 +56,21 @@ export default function Dashboard() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-white text-2xl font-bold">Dashboard</h1>
+        <div>
+          <h1 className="text-white text-2xl font-bold">Dashboard</h1>
+          {profil && (
+            <div className="flex items-center gap-3 mt-1">
+              <div className="flex items-center gap-1">
+                <Trophy size={12} className="text-amber-400" />
+                <span className="text-amber-400 text-xs font-medium">{profil.bedz}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Star size={12} className="text-slate-400" />
+                <span className="text-slate-400 text-xs">{profil.poeni} poena</span>
+              </div>
+            </div>
+          )}
+        </div>
         <div className="flex gap-2">
           {isPremium() && (
             <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">
@@ -57,30 +86,29 @@ export default function Dashboard() {
       {/* Stat kartice */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {isPremium() && (
-          <div className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+          <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
             <p className="text-slate-500 text-xs mb-1">Net worth</p>
-            <p className="text-white text-2xl font-bold">{(data?.net_worth || 0).toLocaleString()} RSD</p>
-            <p className="text-green-400 text-xs mt-1">+12.3% ovaj mesec</p>
+            <p className="text-white text-2xl font-bold">{konvertuj(data?.net_worth || 0)} {valuta}</p>
           </div>
         )}
-        <div className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupni prihodi</p>
-          <p className="text-green-400 text-2xl font-bold">{prihodi.toLocaleString()} RSD</p>
+          <p className="text-green-400 text-2xl font-bold">{konvertuj(prihodi)} {valuta}</p>
         </div>
-        <div className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupni troškovi</p>
-          <p className="text-red-400 text-2xl font-bold">{troskovi.toLocaleString()} RSD</p>
+          <p className="text-red-400 text-2xl font-bold">{konvertuj(troskovi)} {valuta}</p>
         </div>
-        <div className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Bilans meseca</p>
-          <p className={`text-2xl font-bold ${bilans >= 0 ? 'text-white' : 'text-red-400'}`}>{bilans.toLocaleString()} RSD</p>
+          <p className={`text-2xl font-bold ${bilans >= 0 ? 'text-white' : 'text-red-400'}`}>{konvertuj(bilans)} {valuta}</p>
           <p className="text-slate-500 text-xs mt-1">{bilans >= 0 ? 'Pozitivan bilans' : 'Negativan bilans'}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Poslednje transakcije */}
-        <div className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
           <p className="text-white font-medium mb-4">Poslednje transakcije</p>
           <div className="flex flex-col gap-3">
             {poslednje.length === 0 && <p className="text-slate-500 text-sm">Nema transakcija</p>}
@@ -96,7 +124,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <span className={`text-sm font-medium ${t.kategorija?.tip === 'prihod' ? 'text-green-400' : 'text-red-400'}`}>
-                  {t.kategorija?.tip === 'prihod' ? '+' : '-'}{parseFloat(t.kolicina).toLocaleString()}
+                  {t.kategorija?.tip === 'prihod' ? '+' : '-'}{konvertuj(parseFloat(t.kolicina))} {valuta}
                 </span>
               </div>
             ))}
@@ -104,7 +132,7 @@ export default function Dashboard() {
         </div>
 
         {/* Limiti */}
-        <div className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
           <p className="text-white font-medium mb-4">Limiti</p>
           <div className="flex flex-col gap-4">
             {limiti.length === 0 && <p className="text-slate-500 text-sm">Nema postavljenih limita</p>}
@@ -117,7 +145,7 @@ export default function Dashboard() {
                 <div key={l.id}>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-slate-300">{l.kategorija?.naziv}</span>
-                    <span className="text-slate-400">{potroseno.toLocaleString()} / {parseFloat(l.iznos).toLocaleString()}</span>
+                    <span className="text-slate-400">{konvertuj(potroseno)} / {konvertuj(parseFloat(l.iznos))} {valuta}</span>
                   </div>
                   <div className="h-2 bg-white/5 rounded-full">
                     <div

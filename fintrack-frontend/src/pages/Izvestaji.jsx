@@ -78,7 +78,7 @@ export default function Izvestaji() {
         </div>
       </div>
 
-      <div className="bg-[#13141a] border border-white/5 rounded-xl p-4 mb-6">
+      <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4 mb-6">
         <div className="flex gap-3 flex-wrap">
           <div className="flex rounded-lg overflow-hidden border border-white/10">
             {['mesecni', 'godisnji'].map(t => (
@@ -109,13 +109,13 @@ export default function Izvestaji() {
 
       {podaci && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+          <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
             <p className="text-white font-medium mb-4">Prihodi vs troškovi</p>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={chartData}>
                 <XAxis dataKey="name" stroke="#475569" tick={{ fontSize: 11 }} />
                 <YAxis stroke="#475569" tick={{ fontSize: 11 }} />
-                <Tooltip contentStyle={{ background: '#13141a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }} />
+                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }} />
                 <Legend />
                 <Bar dataKey="Prihodi" fill="#22c55e" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="Troškovi" fill="#ef4444" radius={[4, 4, 0, 0]} />
@@ -123,7 +123,7 @@ export default function Izvestaji() {
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+          <div className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
             <p className="text-white font-medium mb-4">Pregled</p>
             <div className="flex flex-col gap-3">
               <div className="flex justify-between py-3 border-b border-white/5">

@@ -53,7 +53,7 @@ export default function Kategorije() {
       {loading ? <p className="text-slate-400">Učitavanje...</p> : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {[{ label: 'Prihodi', items: prihodi, color: 'green' }, { label: 'Troškovi', items: troskovi, color: 'red' }].map(({ label, items, color }) => (
-            <div key={label} className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+            <div key={label} className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
               <p className="text-white font-medium mb-4">{label}</p>
               <div className="flex flex-col gap-2">
                 {items.map(k => (
@@ -83,7 +83,7 @@ export default function Kategorije() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#13141a] border border-white/10 rounded-xl p-6 w-full max-w-md">
+          <div className="bg-[#1e293b] border border-white/10 rounded-xl p-6 w-full max-w-md">
             <h2 className="text-white font-semibold mb-4">Nova kategorija</h2>
             <form onSubmit={handleDodaj} className="flex flex-col gap-4">
               <div>

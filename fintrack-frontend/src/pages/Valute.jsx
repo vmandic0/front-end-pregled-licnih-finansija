@@ -46,7 +46,7 @@ export default function Valute() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Konvertor */}
-        <div className="bg-[#13141a] border border-white/5 rounded-xl p-5">
+        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-5">
           <p className="text-white font-medium mb-4">Konverzija valuta</p>
           <form onSubmit={handleKonvertuj} className="flex flex-col gap-4">
             <div>
@@ -86,7 +86,7 @@ export default function Valute() {
         </div>
 
         {/* Promena preferovane valute */}
-        <div className="bg-[#13141a] border border-white/5 rounded-xl p-5">
+        <div className="bg-[#1e293b] border border-white/5 rounded-xl p-5">
           <p className="text-white font-medium mb-4">Preferovana valuta</p>
           <p className="text-slate-400 text-sm mb-4">Izaberite valutu u kojoj će biti prikazane vaše finansije.</p>
           {poruka && <div className="bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-lg mb-4">{poruka}</div>}

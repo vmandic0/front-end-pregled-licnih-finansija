@@ -28,7 +28,7 @@ export default function AdminKorisnici() {
   return (
     <div>
       <h1 className="text-white text-2xl font-bold mb-6">Korisnici</h1>
-      <div className="bg-[#13141a] border border-white/5 rounded-xl overflow-hidden">
+      <div className="bg-[#1e293b] border border-white/5 rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/5">

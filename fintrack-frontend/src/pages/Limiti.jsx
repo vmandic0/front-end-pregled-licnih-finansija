@@ -69,7 +69,7 @@ export default function Limiti() {
           const potroseno = getPotroseno(l.kategorija_id)
           const procenat = Math.min((potroseno / l.iznos) * 100, 100)
           return (
-            <div key={l.id} className="bg-[#13141a] border border-white/5 rounded-xl p-4">
+            <div key={l.id} className="bg-[#1e293b] border border-white/5 rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <p className="text-white font-medium">{l.kategorija?.naziv}</p>
@@ -104,7 +104,7 @@ export default function Limiti() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#13141a] border border-white/10 rounded-xl p-6 w-full max-w-md">
+          <div className="bg-[#1e293b] border border-white/10 rounded-xl p-6 w-full max-w-md">
             <h2 className="text-white font-semibold mb-4">{editLimit ? 'Izmeni limit' : 'Postavi limit'}</h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {!editLimit && (

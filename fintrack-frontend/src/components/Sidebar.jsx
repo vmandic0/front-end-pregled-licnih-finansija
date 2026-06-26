@@ -19,7 +19,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-52 bg-[#13141a] border-r border-white/5 flex flex-col py-6 px-3">
+    <aside className="fixed top-0 left-0 h-screen w-52 bg-[#1e293b] border-r border-white/5 flex flex-col py-6 px-3">
       {/* Logo */}
       <div className="flex items-center gap-2 px-3 mb-8">
         <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center">
