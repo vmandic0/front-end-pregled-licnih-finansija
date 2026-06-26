@@ -15,15 +15,17 @@ export default function AdminAnalitika() {
     fetch()
   }, [])
 
-  const mesecniData = analitika?.transakcije_po_mesecima
-    ? Object.entries(analitika.transakcije_po_mesecima).slice(0, 6).map(([key, val]) => ({
-        name: key, Iznos: val.ukupno || 0
+  const mesecniData = analitika?.transakcije_po_mesecu
+    ? analitika.transakcije_po_mesecu.slice(0, 6).map(item => ({
+        name: `${item.mesec}/${item.godina}`,
+        Iznos: parseFloat(item.ukupno) || 0
       }))
     : []
 
-  const katData = analitika?.transakcije_po_kategorijama
-    ? Object.entries(analitika.transakcije_po_kategorijama).slice(0, 8).map(([naziv, val]) => ({
-        name: naziv, Iznos: val.ukupno || 0
+  const katData = analitika?.transakcije_po_kategoriji
+    ? analitika.transakcije_po_kategoriji.slice(0, 8).map(item => ({
+        name: item.kategorija?.naziv || 'N/A',
+        Iznos: parseFloat(item.ukupno) || 0
       }))
     : []
 
