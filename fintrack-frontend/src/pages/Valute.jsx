@@ -3,7 +3,7 @@ import api from '../api/axios'
 import { ArrowRightLeft } from 'lucide-react'
 
 export default function Valute() {
-  const [valute, setValute] = useState({})
+  const [valute, setValute] = useState([])
   const [form, setForm] = useState({ iznos: '', iz_valute: 'RSD', u_valutu: 'EUR' })
   const [rezultat, setRezultat] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -36,8 +36,8 @@ export default function Valute() {
     } catch {}
   }
 
-  const valutaOptions = Object.entries(valute).map(([kod, naziv]) => (
-    <option key={kod} value={kod}>{kod} — {naziv}</option>
+  const valutaOptions = valute.map(([kod, naziv]) => (
+    <option key={kod} value={kod}>{naziv}</option>
   ))
 
   return (
@@ -79,8 +79,8 @@ export default function Valute() {
           {rezultat && (
             <div className="mt-4 p-4 bg-white/5 rounded-lg">
               <p className="text-slate-400 text-sm">Rezultat</p>
-              <p className="text-white text-xl font-bold">{rezultat.konvertovani_iznos} {form.u_valutu}</p>
-              <p className="text-slate-500 text-xs mt-1">Kurs: 1 {form.iz_valute} = {rezultat.kurs} {form.u_valutu}</p>
+              <p className="text-white text-xl font-bold">{rezultat.konvertovani_iznos} {rezultat.u_valutu}</p>
+              <p className="text-slate-500 text-xs mt-1">Kurs: 1 {rezultat.iz_valute} = {rezultat.kurs} {rezultat.u_valutu}</p>
             </div>
           )}
         </div>

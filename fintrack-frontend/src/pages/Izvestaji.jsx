@@ -20,14 +20,40 @@ export default function Izvestaji() {
     setLoading(false)
   }
 
-  const exportPDF = () => {
-    const params = tip === 'mesecni' ? `?mesec=${mesec}&godina=${godina}` : `?godina=${godina}`
-    window.open(`http://localhost:8000/api/izvestaj/${tip}/pdf${params}`)
+  const exportCSV = async () => {
+    const params = tip === 'mesecni' ? { mesec, godina } : { godina }
+    try {
+      const res = await api.get(`/izvestaj/${tip}/csv`, {
+        params,
+        responseType: 'blob'
+      })
+      const url = window.URL.createObjectURL(new Blob([res.data]))
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `izvestaj-${tip}-${godina}.csv`
+      a.click()
+      window.URL.revokeObjectURL(url)
+    } catch {
+      console.error('Greška pri preuzimanju CSV')
+    }
   }
 
-  const exportCSV = () => {
-    const params = tip === 'mesecni' ? `?mesec=${mesec}&godina=${godina}` : `?godina=${godina}`
-    window.open(`http://localhost:8000/api/izvestaj/${tip}/csv${params}`)
+  const exportPDF = async () => {
+    const params = tip === 'mesecni' ? { mesec, godina } : { godina }
+    try {
+      const res = await api.get(`/izvestaj/${tip}/pdf`, {
+        params,
+        responseType: 'blob'
+      })
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `izvestaj-${tip}-${godina}.pdf`
+      a.click()
+      window.URL.revokeObjectURL(url)
+    } catch {
+      console.error('Greška pri preuzimanju PDF')
+    }
   }
 
   const chartData = podaci?.po_mesecima
@@ -44,7 +70,7 @@ export default function Izvestaji() {
         <h1 className="text-white text-2xl font-bold">Finansijski izveštaji</h1>
         <div className="flex gap-2">
           <button onClick={exportCSV} className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-slate-300 text-sm px-4 py-2 rounded-lg transition">
-            CSV
+            <Download size={14} /> CSV
           </button>
           <button onClick={exportPDF} className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-slate-300 text-sm px-4 py-2 rounded-lg transition">
             <Download size={14} /> PDF
