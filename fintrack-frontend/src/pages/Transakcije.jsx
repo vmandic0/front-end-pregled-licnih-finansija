@@ -83,7 +83,7 @@ export default function Transakcije() {
       )}
 
       {/* Stat kartice */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupno transakcija</p>
           <p className="text-white text-2xl font-bold">{transakcije.length}</p>
@@ -100,7 +100,7 @@ export default function Transakcije() {
 
       {/* Filteri */}
       <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4 mb-4">
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
@@ -113,7 +113,7 @@ export default function Transakcije() {
           <select
             value={filterKat}
             onChange={e => setFilterKat(e.target.value)}
-            className="bg-white/5 border border-white/10 text-slate-300 px-3 py-2 rounded-lg text-sm outline-none focus:border-amber-500"
+            className="w-full sm:w-auto bg-white/5 border border-white/10 text-slate-300 px-3 py-2 rounded-lg text-sm outline-none focus:border-amber-500"
           >
             <option value="">Sve kategorije</option>
             {kategorije.map(k => <option key={k.id} value={k.id}>{k.naziv}</option>)}
@@ -122,8 +122,8 @@ export default function Transakcije() {
       </div>
 
       {/* Tabela */}
-      <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl overflow-hidden">
-        <table className="w-full">
+      <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl overflow-hidden overflow-x-auto">
+        <table className="w-full min-w-[640px]">
           <thead>
             <tr className="border-b border-white/5">
               <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">OPIS</th>

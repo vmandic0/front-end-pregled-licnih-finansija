@@ -51,7 +51,7 @@ export default function Krediti() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupan dug</p>
           <p className="text-red-400 text-2xl font-bold">{ukupanDug.toLocaleString()} RSD</p>
@@ -90,7 +90,7 @@ export default function Krediti() {
                   <button onClick={() => handleObrisi(k.id)} className="text-slate-500 hover:text-red-400 transition"><Trash2 size={15} /></button>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4 text-sm">
                 <div>
                   <p className="text-slate-500 text-xs">Kamata</p>
                   <p className="text-white">{k.kamatnaStopa}%</p>

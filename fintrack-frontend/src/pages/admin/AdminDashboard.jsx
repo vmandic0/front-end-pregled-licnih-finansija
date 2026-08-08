@@ -44,7 +44,8 @@ export default function AdminDashboard() {
           <p className="text-white font-medium">Korisnici</p>
           <Link to="/admin/korisnici" className="text-amber-400 text-sm hover:underline">Svi korisnici →</Link>
         </div>
-        <table className="w-full">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[560px]">
           <thead>
             <tr className="border-b border-white/5">
               <th className="text-left text-slate-500 text-xs font-medium px-2 py-2">KORISNIK</th>
@@ -72,6 +73,7 @@ export default function AdminDashboard() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

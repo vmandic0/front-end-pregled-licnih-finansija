@@ -28,8 +28,8 @@ export default function AdminKorisnici() {
   return (
     <div>
       <h1 className="text-white text-2xl font-bold mb-6">Korisnici</h1>
-      <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl overflow-hidden">
-        <table className="w-full">
+      <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl overflow-hidden overflow-x-auto">
+        <table className="w-full min-w-[640px]">
           <thead>
             <tr className="border-b border-white/5">
               <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">KORISNIK</th>
