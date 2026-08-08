@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import PremiumRoute from './components/PremiumRoute'
+import AdminRoute from './components/AdminRoute'
 
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -40,9 +41,11 @@ export default function App() {
                 <Route path="/grupna-stednja" element={<GrupnaStednja />} />
               </Route>
 
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/korisnici" element={<AdminKorisnici />} />
-              <Route path="/admin/analitika" element={<AdminAnalitika />} />
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/korisnici" element={<AdminKorisnici />} />
+                <Route path="/admin/analitika" element={<AdminAnalitika />} />
+              </Route>
             </Route>
 
             <Route path="*" element={<Navigate to="/login" />} />
