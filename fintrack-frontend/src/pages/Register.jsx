@@ -123,6 +123,13 @@ export default function Register() {
             Već imate nalog?{' '}
             <Link to="/login" className="text-amber-500 hover:underline">Prijavite se</Link>
           </p>
+
+          <p className="text-slate-600 text-xs text-center mt-4">
+            Registracijom prihvatate{' '}
+            <Link to="/uslovi-koriscenja" className="text-slate-400 hover:text-amber-500 hover:underline">
+              Uslove korišćenja i Politiku privatnosti
+            </Link>
+          </p>
         </div>
       </div>
     </div>
