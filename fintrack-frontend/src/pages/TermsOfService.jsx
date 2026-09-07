@@ -1,14 +1,28 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 
 export default function TermsOfService() {
+  const navigate = useNavigate()
+  const { token } = useAuth()
+
+  const handleBack = () => {
+    // Ako postoji prethodna stranica u istoriji (npr. otvoreno iz footera dok si ulogovan),
+    // vrati korisnika tačno tamo. Inače (npr. otvoreno u novom tabu) idi na dashboard ili login.
+    if (window.history.length > 1) {
+      navigate(-1)
+    } else {
+      navigate(token ? '/dashboard' : '/login')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] px-6 py-10">
       <div className="max-w-3xl mx-auto">
-        <Link to="/login" className="inline-flex items-center gap-2 text-slate-400 hover:text-amber-500 text-sm mb-8 transition">
+        <button onClick={handleBack} className="inline-flex items-center gap-2 text-slate-400 hover:text-amber-500 text-sm mb-8 transition">
           <ArrowLeft size={16} />
           Nazad
-        </Link>
+        </button>
 
         <h1 className="text-white text-3xl font-bold mb-1">Uslovi korišćenja i Autorska prava</h1>
         <p className="text-slate-500 text-sm mb-10">Poslednje ažurirano: 10.08.2026</p>
