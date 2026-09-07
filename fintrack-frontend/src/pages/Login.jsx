@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import Footer from '../components/Footer'
 
 export default function Login() {
   const { login } = useAuth()
@@ -25,7 +26,8 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col">
+    <div className="flex-1 flex">
       {/* Leva strana */}
       <div className="hidden lg:flex w-1/2 flex-col items-center justify-center p-12 border-r border-white/5">
         <div className="w-16 h-16 rounded-2xl bg-amber-500 flex items-center justify-center mb-6">
@@ -106,6 +108,8 @@ export default function Login() {
           </p>
         </div>
       </div>
+    </div>
+      <Footer />
     </div>
   )
 }

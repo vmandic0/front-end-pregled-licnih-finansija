@@ -11,11 +11,11 @@ export default function TermsOfService() {
         </Link>
 
         <h1 className="text-white text-3xl font-bold mb-1">Uslovi korišćenja i Autorska prava</h1>
-        <p className="text-slate-500 text-sm mb-10">Poslednje ažurirano: [popuni datum]</p>
+        <p className="text-slate-500 text-sm mb-10">Poslednje ažurirano: 10.08.2026</p>
 
-        <p className="text-slate-400 text-sm bg-white/5 border border-white/10 rounded-lg px-4 py-3 mb-10">
+        {/* <p className="text-slate-400 text-sm bg-white/5 border border-white/10 rounded-lg px-4 py-3 mb-10">
           Ovo je opšti tekst pripremljen za studentski/portfolio projekat i ne predstavlja pravni savet advokata.
-        </p>
+        </p> */}
 
         <Section title="Uslovi korišćenja (Terms of Service)">
           <SubTitle>1. Opis usluge</SubTitle>
