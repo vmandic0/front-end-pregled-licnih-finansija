@@ -17,32 +17,28 @@ const api = axios.create({
 })
 
 let csrfRequest
-
-function getXsrfToken() {
-  const cookie = document.cookie
-    .split('; ')
-    .find((item) => item.startsWith('XSRF-TOKEN='))
-
-  return cookie ? decodeURIComponent(cookie.slice('XSRF-TOKEN='.length)) : null
-}
+let csrfToken
 
 export function ensureCsrfCookie() {
   if (!csrfRequest) {
     csrfRequest = axios.get(`${backendBaseUrl}/sanctum/csrf-cookie`, {
       withCredentials: true,
-    }).finally(() => {
-      csrfRequest = undefined
     })
+      .then(() => api.get('/csrf-token'))
+      .then(({ data }) => {
+        csrfToken = data.token
+      })
+      .finally(() => {
+        csrfRequest = undefined
+      })
   }
 
   return csrfRequest
 }
 
 api.interceptors.request.use((config) => {
-  const xsrfToken = getXsrfToken()
-
-  if (xsrfToken && !config.headers['X-XSRF-TOKEN']) {
-    config.headers['X-XSRF-TOKEN'] = xsrfToken
+  if (csrfToken && !config.headers['X-XSRF-TOKEN']) {
+    config.headers['X-XSRF-TOKEN'] = csrfToken
   }
 
   return config
