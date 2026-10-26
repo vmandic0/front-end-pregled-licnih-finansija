@@ -18,6 +18,14 @@ const api = axios.create({
 
 let csrfRequest
 
+function getXsrfToken() {
+  const cookie = document.cookie
+    .split('; ')
+    .find((item) => item.startsWith('XSRF-TOKEN='))
+
+  return cookie ? decodeURIComponent(cookie.slice('XSRF-TOKEN='.length)) : null
+}
+
 export function ensureCsrfCookie() {
   if (!csrfRequest) {
     csrfRequest = axios.get(`${backendBaseUrl}/sanctum/csrf-cookie`, {
@@ -29,6 +37,16 @@ export function ensureCsrfCookie() {
 
   return csrfRequest
 }
+
+api.interceptors.request.use((config) => {
+  const xsrfToken = getXsrfToken()
+
+  if (xsrfToken && !config.headers['X-XSRF-TOKEN']) {
+    config.headers['X-XSRF-TOKEN'] = xsrfToken
+  }
+
+  return config
+})
 
 api.interceptors.response.use(
   (response) => response,
