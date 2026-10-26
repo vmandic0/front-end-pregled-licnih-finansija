@@ -37,8 +37,8 @@ export function ensureCsrfCookie() {
 }
 
 api.interceptors.request.use((config) => {
-  if (csrfToken && !config.headers['X-XSRF-TOKEN']) {
-    config.headers['X-XSRF-TOKEN'] = csrfToken
+  if (csrfToken && !config.headers['X-CSRF-TOKEN']) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken
   }
 
   return config
