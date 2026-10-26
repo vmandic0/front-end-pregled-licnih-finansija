@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import api, { ensureCsrfCookie } from '../api/axios'
 
 const AuthContext = createContext()
@@ -6,6 +6,7 @@ const AuthContext = createContext()
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const authChangedDuringInitialCheck = useRef(false)
 
   useEffect(() => {
     api.get('/user')
@@ -14,7 +15,9 @@ export function AuthProvider({ children }) {
         if (error.response?.status !== 401) {
           console.error('Nije moguće učitati sesiju korisnika.', error)
         }
-        setUser(null)
+        if (!authChangedDuringInitialCheck.current) {
+          setUser(null)
+        }
       })
       .finally(() => setLoading(false))
   }, [])
@@ -23,6 +26,7 @@ export function AuthProvider({ children }) {
     await ensureCsrfCookie()
     const res = await api.post('/login', { email, password })
     const { user } = res.data
+    authChangedDuringInitialCheck.current = true
     setUser(user)
     return user
   }
@@ -30,6 +34,7 @@ export function AuthProvider({ children }) {
   const register = async (name, email, password, password_confirmation) => {
     await ensureCsrfCookie()
     const res = await api.post('/register', { name, email, password, password_confirmation })
+    authChangedDuringInitialCheck.current = true
     setUser(res.data.user)
     return res.data
   }
