@@ -4,8 +4,9 @@ import Sidebar from './Sidebar'
 import Footer from './Footer'
 
 export default function ProtectedRoute() {
-  const { token } = useAuth()
-  if (!token) return <Navigate to="/login" />
+  const { user, loading } = useAuth()
+  if (loading) return null
+  if (!user) return <Navigate to="/login" replace />
   return (
     <div className="flex min-h-screen bg-[var(--bg-primary)]">
       <Sidebar />

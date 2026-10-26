@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 
 export default function TermsOfService() {
   const navigate = useNavigate()
-  const { token } = useAuth()
+  const { user } = useAuth()
 
   const handleBack = () => {
     // Ako postoji prethodna stranica u istoriji (npr. otvoreno iz footera dok si ulogovan),
@@ -12,7 +12,7 @@ export default function TermsOfService() {
     if (window.history.length > 1) {
       navigate(-1)
     } else {
-      navigate(token ? '/dashboard' : '/login')
+      navigate(user ? '/dashboard' : '/login')
     }
   }
 

@@ -21,7 +21,7 @@ export default function Register() {
     setLoading(true)
     try {
       await register(form.name, form.email, form.password, form.password_confirmation)
-      navigate('/login')
+      navigate('/dashboard')
     } catch (err) {
       setError(err.response?.data?.message || 'Greška pri registraciji.')
     } finally {
