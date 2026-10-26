@@ -51,7 +51,7 @@ export function AuthProvider({ children }) {
   }
 
   const isAdmin = () => user?.type === 'administrator'
-  const isPremium = () => user?.klijent?.premium_klijent === true
+  const isPremium = () => isAdmin() || user?.klijent?.premium_klijent === true
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout, isAdmin, isPremium, loading }}>
