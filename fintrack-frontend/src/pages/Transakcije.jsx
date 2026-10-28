@@ -16,6 +16,7 @@ export default function Transakcije() {
     datum: '',
     ponavljaj: false,
     ucestalost: 'mesecno',
+    interval_vrednost: 1,
   })
   const [poruka, setPoruka] = useState('')
   const [kurs, setKurs] = useState(1)
@@ -57,13 +58,14 @@ export default function Transakcije() {
           kategorija_id: form.kategorija_id,
           kolicina: form.kolicina,
           ucestalost: form.ucestalost,
+          interval_vrednost: form.interval_vrednost,
           sledeci_datum: form.datum,
         }
         : form
       const res = await api.post(endpoint, payload)
       setPoruka(res.data.upozorenje || 'Transakcija dodata!')
       setShowModal(false)
-      setForm({ kategorija_id: '', kolicina: '', datum: '', ponavljaj: false, ucestalost: 'mesecno' })
+      setForm({ kategorija_id: '', kolicina: '', datum: '', ponavljaj: false, ucestalost: 'mesecno', interval_vrednost: 1 })
       fetchAll()
     } catch {
       setPoruka('Greška pri dodavanju.')
@@ -211,7 +213,7 @@ export default function Transakcije() {
                   <td className="px-4 py-3 text-white text-sm">{p.kategorija?.naziv}</td>
                   <td className="px-4 py-3 text-slate-400 text-sm">{p.kolicina} RSD</td>
                   <td className="px-4 py-3 text-slate-400 text-sm">
-                    {p.ucestalost === 'nedeljno' ? 'Jednom nedeljno' : p.ucestalost === 'mesecno' ? 'Jednom mesečno' : 'Jednom godišnje'}
+                    {p.interval_vrednost > 1 ? `Svakih ${p.interval_vrednost} ${p.ucestalost === 'nedeljno' ? 'nedelja' : p.ucestalost === 'mesecno' ? 'meseci' : 'godina'}` : p.ucestalost === 'nedeljno' ? 'Jednom nedeljno' : p.ucestalost === 'mesecno' ? 'Jednom mesečno' : 'Jednom godišnje'}
                   </td>
                   <td className="px-4 py-3 text-slate-400 text-sm">{p.sledeci_datum}</td>
                   <td className="px-4 py-3">
@@ -276,6 +278,21 @@ export default function Transakcije() {
               </label>
               {form.ponavljaj && (
                 <div>
+                  <label className="text-slate-400 text-sm mb-1 block">Ponavljaj svakih</label>
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="number"
+                      min="1"
+                      max="365"
+                      value={form.interval_vrednost}
+                      onChange={e => setForm({ ...form, interval_vrednost: e.target.value })}
+                      className="w-24 bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500"
+                      required
+                    />
+                    <span className="flex items-center text-slate-400 text-sm">
+                      {form.ucestalost === 'nedeljno' ? 'nedelja' : form.ucestalost === 'mesecno' ? 'meseci' : 'godina'}
+                    </span>
+                  </div>
                   <label className="text-slate-400 text-sm mb-1 block">Učestalost</label>
                   <select
                     value={form.ucestalost}
