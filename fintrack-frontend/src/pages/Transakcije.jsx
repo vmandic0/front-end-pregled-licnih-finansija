@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
-import { Plus, Search, TrendingUp, TrendingDown, Trash2 } from 'lucide-react'
+import { Plus, Search, Trash2 } from 'lucide-react'
 
 export default function Transakcije() {
   const [transakcije, setTransakcije] = useState([])
@@ -9,7 +9,14 @@ export default function Transakcije() {
   const [search, setSearch] = useState('')
   const [filterKat, setFilterKat] = useState('')
   const [showModal, setShowModal] = useState(false)
-  const [form, setForm] = useState({ kategorija_id: '', kolicina: '', datum: '' })
+  const [ponavljajuce, setPonavljajuce] = useState([])
+  const [form, setForm] = useState({
+    kategorija_id: '',
+    kolicina: '',
+    datum: '',
+    ponavljaj: false,
+    ucestalost: 'mesecno',
+  })
   const [poruka, setPoruka] = useState('')
   const [kurs, setKurs] = useState(1)
   const [valuta, setValuta] = useState('RSD')
@@ -18,13 +25,15 @@ export default function Transakcije() {
 
   const fetchAll = async () => {
     try {
-      const [tRes, kRes, pRes] = await Promise.all([
+      const [tRes, kRes, pRes, rRes] = await Promise.all([
         api.get('/transakcije'),
         api.get('/kategorije'),
         api.get('/profil'),
+        api.get('/ponavljajuce-transakcije'),
       ])
       setTransakcije(tRes.data.data || tRes.data)
       setKategorije(kRes.data.data || kRes.data)
+      setPonavljajuce(rRes.data.data || rRes.data)
 
       const prefValuta = pRes.data.preferred_currency || 'RSD'
       setValuta(prefValuta)
@@ -42,14 +51,29 @@ export default function Transakcije() {
   const handleDodaj = async (e) => {
     e.preventDefault()
     try {
-      const res = await api.post('/transakcije', form)
+      const endpoint = form.ponavljaj ? '/ponavljajuce-transakcije' : '/transakcije'
+      const payload = form.ponavljaj
+        ? {
+          kategorija_id: form.kategorija_id,
+          kolicina: form.kolicina,
+          ucestalost: form.ucestalost,
+          sledeci_datum: form.datum,
+        }
+        : form
+      const res = await api.post(endpoint, payload)
       setPoruka(res.data.upozorenje || 'Transakcija dodata!')
       setShowModal(false)
-      setForm({ kategorija_id: '', kolicina: '', datum: '' })
+      setForm({ kategorija_id: '', kolicina: '', datum: '', ponavljaj: false, ucestalost: 'mesecno' })
       fetchAll()
     } catch {
       setPoruka('Greška pri dodavanju.')
     }
+  }
+
+  const handleObrisiPonavljajucu = async (id) => {
+    if (!confirm('Obrisati ponavljajuću transakciju?')) return
+    await api.delete(`/ponavljajuce-transakcije/${id}`)
+    fetchAll()
   }
 
   const handleObrisi = async (id) => {
@@ -165,6 +189,43 @@ export default function Transakcije() {
         </table>
       </div>
 
+      {ponavljajuce.length > 0 && (
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl overflow-hidden overflow-x-auto mt-6">
+          <div className="px-4 py-3 border-b border-white/5">
+            <h2 className="text-white font-semibold">Ponavljajuće transakcije</h2>
+            <p className="text-slate-500 text-xs mt-1">Nove transakcije se automatski kreiraju na sledeći datum.</p>
+          </div>
+          <table className="w-full min-w-[640px]">
+            <thead>
+              <tr className="border-b border-white/5">
+                <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">KATEGORIJA</th>
+                <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">IZNOS</th>
+                <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">UČESTALOST</th>
+                <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">SLEDEĆI DATUM</th>
+                <th className="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {ponavljajuce.map(p => (
+                <tr key={p.id} className="border-b border-white/5">
+                  <td className="px-4 py-3 text-white text-sm">{p.kategorija?.naziv}</td>
+                  <td className="px-4 py-3 text-slate-400 text-sm">{p.kolicina} RSD</td>
+                  <td className="px-4 py-3 text-slate-400 text-sm">
+                    {p.ucestalost === 'nedeljno' ? 'Jednom nedeljno' : p.ucestalost === 'mesecno' ? 'Jednom mesečno' : 'Jednom godišnje'}
+                  </td>
+                  <td className="px-4 py-3 text-slate-400 text-sm">{p.sledeci_datum}</td>
+                  <td className="px-4 py-3">
+                    <button onClick={() => handleObrisiPonavljajucu(p.id)} className="text-slate-600 hover:text-red-400 transition">
+                      <Trash2 size={14} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
@@ -204,6 +265,29 @@ export default function Transakcije() {
                   required
                 />
               </div>
+              <label className="flex items-center gap-2 text-slate-300 text-sm">
+                <input
+                  type="checkbox"
+                  checked={form.ponavljaj}
+                  onChange={e => setForm({ ...form, ponavljaj: e.target.checked })}
+                  className="accent-amber-500"
+                />
+                Ponavljajuća transakcija
+              </label>
+              {form.ponavljaj && (
+                <div>
+                  <label className="text-slate-400 text-sm mb-1 block">Učestalost</label>
+                  <select
+                    value={form.ucestalost}
+                    onChange={e => setForm({ ...form, ucestalost: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500"
+                  >
+                    <option value="nedeljno">Jednom nedeljno</option>
+                    <option value="mesecno">Jednom mesečno</option>
+                    <option value="godisnje">Jednom godišnje</option>
+                  </select>
+                </div>
+              )}
               <div className="flex gap-3 mt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-white/5 text-slate-300 py-3 rounded-lg hover:bg-white/10 transition">
                   Otkaži
