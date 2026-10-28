@@ -16,7 +16,7 @@ export default function AdminKorisnici() {
   }
 
   const handlePromeniUlogu = async (id, type) => {
-    await api.put(`/admin/korisnici/${id}/uloge`, { type })
+    await api.put(`/admin/korisnici/${id}/uloga`, { type })
     fetchKorisnici()
   }
 

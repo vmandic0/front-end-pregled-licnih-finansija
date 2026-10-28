@@ -19,3 +19,19 @@
   --text-muted: #94a3b8;
   --border: rgba(255,255,255,0.05);
 }
+
+select {
+  color: var(--text-primary);
+  background-color: var(--bg-card);
+}
+
+select option {
+  color: #e2e8f0;
+  background-color: #1e293b;
+}
+
+select option:checked,
+select option:hover {
+  color: #ffffff;
+  background-color: #334155;
+}

@@ -24,7 +24,12 @@ export function ensureCsrfCookie() {
     csrfRequest = axios.get(`${backendBaseUrl}/sanctum/csrf-cookie`, {
       withCredentials: true,
     })
-      .then(() => api.get('/csrf-token'))
+      .then(() => axios.get(`${apiBaseUrl}/csrf-token`, {
+        withCredentials: true,
+        headers: {
+          Accept: 'application/json',
+        },
+      }))
       .then(({ data }) => {
         csrfToken = data.token
       })
@@ -36,7 +41,16 @@ export function ensureCsrfCookie() {
   return csrfRequest
 }
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
+  const method = (config.method || 'get').toLowerCase()
+  const isMutatingRequest = ['post', 'put', 'patch', 'delete'].includes(method)
+  const isCsrfRequest = config.url?.endsWith('/csrf-token')
+
+  if (isMutatingRequest && !isCsrfRequest) {
+    await ensureCsrfCookie()
+  }
+
+  config.headers = config.headers || {}
   if (csrfToken && !config.headers['X-CSRF-TOKEN']) {
     config.headers['X-CSRF-TOKEN'] = csrfToken
   }
@@ -46,7 +60,17 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const config = error.config
+    if (error.response?.status === 419 && config && !config._csrfRetry) {
+      config._csrfRetry = true
+      csrfToken = undefined
+      await ensureCsrfCookie()
+      config.headers = config.headers || {}
+      config.headers['X-CSRF-TOKEN'] = csrfToken
+      return api(config)
+    }
+
     const requestUrl = error.config?.url || ''
     const isAuthEndpoint = ['/login', '/register', '/user'].some((path) => requestUrl.includes(path))
     if (error.response?.status === 401 && !isAuthEndpoint) {
