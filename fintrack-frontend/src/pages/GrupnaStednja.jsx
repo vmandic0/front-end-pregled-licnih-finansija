@@ -48,8 +48,8 @@ export default function GrupnaStednja() {
       setIzabraniClanovi([])
       setPretraga('')
       fetchGrupe()
-    } catch {
-      setPoruka('Nije moguće kreirati grupu ili poslati pozive.')
+    } catch (error) {
+      setPoruka(error.response?.data?.message || 'Nije moguće kreirati grupu ili poslati pozive.')
     }
 
   }
