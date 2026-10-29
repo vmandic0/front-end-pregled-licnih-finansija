@@ -80,6 +80,10 @@ html:not(.dark) .text-white {
   color: var(--tx);
 }
 
+html:not(.dark) .text-slate-200 {
+  color: #27272A;
+}
+
 html:not(.dark) .bg-amber-500.text-white,
 html:not(.dark) .bg-green-500.text-white,
 html:not(.dark) .bg-red-500.text-white,
@@ -115,6 +119,42 @@ html:not(.dark) .border-white\/10 {
 
 html:not(.dark) .hover\:bg-white\/5:hover {
   background-color: rgba(17, 17, 19, .07);
+}
+
+html:not(.dark) .hover\:text-white:hover {
+  color: var(--tx);
+}
+
+html:not(.dark) .text-amber-400 {
+  color: #92400E;
+}
+
+html:not(.dark) .text-green-400 {
+  color: #15803D;
+}
+
+html:not(.dark) .text-red-400 {
+  color: #B91C1C;
+}
+
+html:not(.dark) .text-purple-400 {
+  color: #7E22CE;
+}
+
+html:not(.dark) input,
+html:not(.dark) textarea {
+  color: var(--tx);
+  caret-color: var(--ac);
+}
+
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+  color: #71717A;
+  opacity: 1;
+}
+
+html:not(.dark) .bg-black\/50 {
+  background-color: rgba(0, 0, 0, .35);
 }
 
 html:not(.dark) select option {
