@@ -19,7 +19,9 @@ export default function Login() {
       if (user.type === 'administrator') navigate('/admin')
       else navigate('/dashboard')
     } catch (err) {
-      setError('Pogrešan email ili lozinka.')
+      setError(err.response?.status === 419
+        ? 'Sesija za prijavu je istekla. Osvežite stranicu i pokušajte ponovo.'
+        : (err.response?.data?.message || 'Pogrešan email ili lozinka.'))
     } finally {
       setLoading(false)
     }
