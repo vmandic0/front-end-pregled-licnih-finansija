@@ -30,6 +30,12 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
+  useEffect(() => {
+    const handleUnauthorized = () => setUser(null)
+    window.addEventListener('fintrack:unauthorized', handleUnauthorized)
+    return () => window.removeEventListener('fintrack:unauthorized', handleUnauthorized)
+  }, [])
+
   const login = async (email, password) => {
     initialCheckController.current?.abort()
     await ensureCsrfCookie()

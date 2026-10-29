@@ -56,7 +56,7 @@ export default function Transakcije() {
       setPoruka(res.data.upozorenje || 'Transakcija dodata!')
       setShowModal(false)
       setForm({ kategorija_id: '', kolicina: '', datum: '', ponavljaj: false, ucestalost: 'mesecno', interval_vrednost: 1 })
-      fetchAll()
+      await fetchAll()
     } catch {
       setPoruka('Greška pri dodavanju.')
     }
@@ -64,14 +64,22 @@ export default function Transakcije() {
 
   const handleObrisiPonavljajucu = async (id) => {
     if (!confirm('Obrisati ponavljajuću transakciju?')) return
-    await api.delete(`/ponavljajuce-transakcije/${id}`)
-    fetchAll()
+    try {
+      await api.delete(`/ponavljajuce-transakcije/${id}`)
+      await fetchAll()
+    } catch (error) {
+      setPoruka(error.response?.data?.message || 'Brisanje ponavljajuće transakcije nije uspelo.')
+    }
   }
 
   const handleObrisi = async (id) => {
     if (!confirm('Obrisati transakciju?')) return
-    await api.delete(`/transakcije/${id}`)
-    fetchAll()
+    try {
+      await api.delete(`/transakcije/${id}`)
+      await fetchAll()
+    } catch (error) {
+      setPoruka(error.response?.data?.message || 'Brisanje transakcije nije uspelo.')
+    }
   }
 
   const filtered = transakcije.filter(t => {

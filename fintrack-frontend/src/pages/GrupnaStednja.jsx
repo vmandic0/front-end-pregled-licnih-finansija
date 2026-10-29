@@ -59,6 +59,7 @@ export default function GrupnaStednja() {
     try {
       await api.delete(`/grupe/${grupa.id}`)
       setGrupe(current => current.filter(item => item.id !== grupa.id))
+      setPoruka('Grupa je uspešno obrisana.')
     } catch {
       setPoruka('Nije moguće obrisati grupu.')
     }

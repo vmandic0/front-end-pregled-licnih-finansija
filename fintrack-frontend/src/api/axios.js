@@ -72,10 +72,11 @@ api.interceptors.response.use(
     }
 
     const requestUrl = error.config?.url || ''
-    const isAuthEndpoint = ['/login', '/register', '/user'].some((path) => requestUrl.includes(path))
+    const isAuthEndpoint = ['/login', '/register', '/user'].some(path => requestUrl.includes(path))
     if (error.response?.status === 401 && !isAuthEndpoint) {
-      window.location.href = '/login'
+      window.dispatchEvent(new CustomEvent('fintrack:unauthorized'))
     }
+
     return Promise.reject(error)
   },
 )
