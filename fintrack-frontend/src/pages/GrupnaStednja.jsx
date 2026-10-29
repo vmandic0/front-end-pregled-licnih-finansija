@@ -140,11 +140,25 @@ export default function GrupnaStednja() {
                   <span className="text-slate-500 text-xs">{g.udeli?.length || 0} članova</span>
                 </div>
               </div>
+              {g.udeli?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {g.udeli.map(udeo => (
+                    <span key={udeo.id} className="text-slate-400 text-xs bg-white/5 px-2 py-1 rounded-full">
+                      {udeo.klijent?.user?.name || 'Član'}
+                    </span>
+                  ))}
+                </div>
+              )}
               {g.pozivi?.some(poziv => poziv.status === 'na_cekanju') && (
                 <p className="text-amber-400 text-xs mt-3">
                   Pozivi na čekanju: {g.pozivi.filter(poziv => poziv.status === 'na_cekanju').map(poziv => poziv.pozvani?.user?.name).join(', ')}
                 </p>
               )}
+              {g.pozivi?.filter(poziv => poziv.status !== 'na_cekanju').map(poziv => (
+                <p key={poziv.id} className={`text-xs mt-2 ${poziv.status === 'prihvacen' ? 'text-green-400' : 'text-red-400'}`}>
+                  {poziv.pozvani?.user?.name || 'Korisnik'} — {poziv.status === 'prihvacen' ? 'prihvatio poziv' : poziv.status === 'odbijen' ? 'odbio poziv' : poziv.status}
+                </p>
+              ))}
             </div>
           )
         })}

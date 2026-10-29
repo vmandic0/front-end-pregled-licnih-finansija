@@ -74,6 +74,12 @@ select option:hover {
   background-color: #334155;
 }
 
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
 html:not(.dark) .text-white {
   color: var(--tx);
 }

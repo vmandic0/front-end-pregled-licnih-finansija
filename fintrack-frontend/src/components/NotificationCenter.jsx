@@ -12,9 +12,39 @@ export default function NotificationCenter() {
 
   const loadNotifications = useCallback(async (showBrowserNotification = false) => {
     try {
-      const { data } = await api.get('/obavestenja')
+      const [{ data }, { data: pendingInvitations }] = await Promise.all([
+        api.get('/obavestenja'),
+        api.get('/grupni-pozivi'),
+      ])
       const items = data.data || data
-      const unread = items.filter(item => !item.read_at)
+      const invitationNotifications = pendingInvitations.map(invitation => ({
+        id: `group-invitation-${invitation.id}`,
+        read_at: null,
+        data: {
+          event_key: `group-invitation:${invitation.id}`,
+          title: 'Poziv za grupnu štednju',
+          message: `${invitation.pozivalac} vas je pozvao u grupu „${invitation.grupa_naziv}“.`,
+          details: {
+            type: 'group_invitation',
+            invitation_id: invitation.id,
+            group_id: invitation.grupa_id,
+            group_name: invitation.grupa_naziv,
+            inviter_name: invitation.pozivalac,
+            actions: true,
+          },
+        },
+      }))
+      const existingInvitationIds = new Set(
+        items
+          .map(item => item.data?.details?.invitation_id)
+          .filter(Boolean)
+          .map(String),
+      )
+      const mergedItems = [
+        ...items,
+        ...invitationNotifications.filter(item => !existingInvitationIds.has(String(item.data.details.invitation_id))),
+      ]
+      const unread = mergedItems.filter(item => !item.read_at)
 
       if (showBrowserNotification && 'Notification' in window && Notification.permission === 'granted') {
         unread
@@ -22,8 +52,8 @@ export default function NotificationCenter() {
           .forEach(item => new Notification(item.data.title, { body: item.data.message }))
       }
 
-      items.forEach(item => knownIds.current.add(item.id))
-      setNotifications(items)
+      mergedItems.forEach(item => knownIds.current.add(item.id))
+      setNotifications(mergedItems)
     } catch (error) {
       console.error('Nije moguće učitati obaveštenja.', error)
     }
@@ -52,7 +82,8 @@ export default function NotificationCenter() {
   }
 
   const openNotification = async (notification) => {
-    if (!notification.read_at) {
+    const isSyntheticInvitation = String(notification.id).startsWith('group-invitation-')
+    if (!notification.read_at && !isSyntheticInvitation) {
       await api.post(`/obavestenja/${notification.id}/procitano`)
       setNotifications(current => current.map(item => (
         item.id === notification.id ? { ...item, read_at: new Date().toISOString() } : item
