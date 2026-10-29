@@ -41,6 +41,16 @@ export default function NotificationCenter() {
     }
   }
 
+  const answerGroupInvitation = async (invitationId, answer) => {
+    try {
+      await api.post(`/grupni-pozivi/${invitationId}/${answer}`)
+      setSelected(null)
+      await loadNotifications()
+    } catch (error) {
+      console.error('Nije moguće obraditi poziv za grupu.', error)
+    }
+  }
+
   const openNotification = async (notification) => {
     if (!notification.read_at) {
       await api.post(`/obavestenja/${notification.id}/procitano`)
@@ -111,6 +121,18 @@ export default function NotificationCenter() {
                 {selected.data.details.category && <p>Kategorija: {selected.data.details.category}</p>}
                 {selected.data.details.amount && <p>Iznos: {formatMoney(selected.data.details.amount)}</p>}
                 {selected.data.details.percentage && <p>Iskorišćenost limita: {selected.data.details.percentage}%</p>}
+              </div>
+            )}
+            {selected.data.details?.type === 'group_invitation' && selected.data.details?.actions && (
+              <div className="flex gap-3 mt-5">
+                <button onClick={() => answerGroupInvitation(selected.data.details.invitation_id, 'odbij')}
+                  className="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 py-2 rounded-lg">
+                  Odbij
+                </button>
+                <button onClick={() => answerGroupInvitation(selected.data.details.invitation_id, 'prihvati')}
+                  className="flex-1 bg-green-500/10 hover:bg-green-500/20 text-green-400 py-2 rounded-lg">
+                  Prihvati
+                </button>
               </div>
             )}
             <button onClick={() => setSelected(null)} className="mt-5 w-full bg-white/5 hover:bg-white/10 text-slate-300 py-2 rounded-lg">
