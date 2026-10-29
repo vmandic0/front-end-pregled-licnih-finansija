@@ -35,19 +35,22 @@ export default function GrupnaStednja() {
     try {
       const res = await api.get('/grupe')
       setGrupe(res.data.data || res.data)
-    } catch {}
+    } catch (error) {
+      setPoruka(error.response?.data?.message || 'Nije moguće učitati grupne transakcije.')
+    }
   }
 
   const handleKreiraj = async (e) => {
     e.preventDefault()
     try {
       const payload = { ...form, clanovi: izabraniClanovi }
-      await api.post('/grupe', payload)
+      const { data } = await api.post('/grupe', payload)
+      setGrupe(current => [data.grupa, ...current])
+      setPoruka(data.message || 'Grupa je uspešno kreirana.')
       setShowModal(false)
       setForm({ naziv: '', ciljIznos: '', rok: '' })
       setIzabraniClanovi([])
       setPretraga('')
-      fetchGrupe()
     } catch (error) {
       setPoruka(error.response?.data?.message || 'Nije moguće kreirati grupu ili poslati pozive.')
     }
