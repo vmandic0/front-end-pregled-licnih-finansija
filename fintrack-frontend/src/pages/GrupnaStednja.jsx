@@ -46,7 +46,8 @@ export default function GrupnaStednja() {
       const payload = { ...form, clanovi: izabraniClanovi }
       const { data } = await api.post('/grupe', payload)
       setGrupe(current => [data.grupa, ...current])
-      setPoruka(data.message || 'Grupa je uspešno kreirana.')
+      const sentInvitations = data.poslato_poziva || 0
+      setPoruka(`${data.message || 'Grupa je uspešno kreirana.'}${sentInvitations ? ` Poslato poziva: ${sentInvitations}.` : ''}`)
       setShowModal(false)
       setForm({ naziv: '', ciljIznos: '', rok: '' })
       setIzabraniClanovi([])
