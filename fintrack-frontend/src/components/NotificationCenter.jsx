@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Bell, Check, X } from 'lucide-react'
 import api from '../api/axios'
 import { useCurrency } from '../context/CurrencyContext'
+import { useAuth } from '../context/AuthContext'
 
 export default function NotificationCenter() {
   const [notifications, setNotifications] = useState([])
@@ -9,6 +10,7 @@ export default function NotificationCenter() {
   const [open, setOpen] = useState(false)
   const knownIds = useRef(new Set())
   const { formatMoney } = useCurrency()
+  const { user, loading: authLoading } = useAuth()
 
   const loadNotifications = useCallback(async (showBrowserNotification = false) => {
     try {
@@ -60,10 +62,12 @@ export default function NotificationCenter() {
   }, [])
 
   useEffect(() => {
+    if (authLoading || !user) return undefined
+
     loadNotifications()
     const interval = window.setInterval(() => loadNotifications(true), 60000)
     return () => window.clearInterval(interval)
-  }, [loadNotifications])
+  }, [authLoading, user, loadNotifications])
 
   const requestBrowserNotifications = async () => {
     if ('Notification' in window && Notification.permission === 'default') {
