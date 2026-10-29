@@ -106,11 +106,11 @@ export default function Transakcije() {
         </div>
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Prihodi</p>
-          <p className="text-green-400 text-2xl font-bold">{konvertuj(prihodi)} {valuta}</p>
+          <p className="text-green-400 text-2xl font-bold">{formatMoney(prihodi)}</p>
         </div>
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Troškovi</p>
-          <p className="text-red-400 text-2xl font-bold">{konvertuj(troskovi)} {valuta}</p>
+          <p className="text-red-400 text-2xl font-bold">{formatMoney(-troskovi, { sign: true })}</p>
         </div>
       </div>
 
