@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
-import { Plus, Users, Search } from 'lucide-react'
+import { Plus, Users, Search, Trash2 } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
 
 export default function GrupnaStednja() {
@@ -8,7 +8,7 @@ export default function GrupnaStednja() {
   const [showModal, setShowModal] = useState(false)
   const [showUplataModal, setShowUplataModal] = useState(false)
   const [selectedGrupa, setSelectedGrupa] = useState(null)
-  const [form, setForm] = useState({ naziv: '', ciljIznos: '' })
+  const [form, setForm] = useState({ naziv: '', ciljIznos: '', rok: '' })
   const [kandidati, setKandidati] = useState([])
   const [izabraniClanovi, setIzabraniClanovi] = useState([])
   const [pretraga, setPretraga] = useState('')
@@ -44,12 +44,23 @@ export default function GrupnaStednja() {
       const payload = { ...form, clanovi: izabraniClanovi }
       await api.post('/grupe', payload)
       setShowModal(false)
-      setForm({ naziv: '', ciljIznos: '' })
+      setForm({ naziv: '', ciljIznos: '', rok: '' })
       setIzabraniClanovi([])
       setPretraga('')
       fetchGrupe()
     } catch {
       setPoruka('Nije moguće kreirati grupu ili poslati pozive.')
+    }
+
+  }
+
+  const handleObrisiGrupu = async grupa => {
+    if (!window.confirm(`Obrisati grupu „${grupa.naziv}“?`)) return
+    try {
+      await api.delete(`/grupe/${grupa.id}`)
+      setGrupe(current => current.filter(item => item.id !== grupa.id))
+    } catch {
+      setPoruka('Nije moguće obrisati grupu.')
     }
   }
 
@@ -107,11 +118,17 @@ export default function GrupnaStednja() {
                     className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs px-3 py-1 rounded-lg transition">
                     Uplati
                   </button>
+                  {g.je_kreator && (
+                    <button onClick={() => handleObrisiGrupu(g)} className="text-slate-500 hover:text-red-400" aria-label={`Obriši grupu ${g.naziv}`}>
+                      <Trash2 size={15} />
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="h-2 bg-white/5 rounded-full mb-2">
                 <div className="h-2 rounded-full bg-amber-500 transition-all" style={{ width: `${procenat}%` }} />
               </div>
+              {g.rok && <p className="text-slate-500 text-xs mt-2">Rok za prikupljanje: {g.rok}</p>}
               <div className="flex items-center justify-between">
                 <span className="text-slate-500 text-sm">{formatMoney(parseFloat(g.trenutnoPrikupljeno || 0))} / {formatMoney(parseFloat(g.ciljIznos))}</span>
                 <div className="flex items-center gap-1">
@@ -143,6 +160,12 @@ export default function GrupnaStednja() {
                 <label className="text-slate-400 text-sm mb-1 block">Ciljni iznos ({currency})</label>
                 <input type="number" value={form.ciljIznos} onChange={e => setForm({ ...form, ciljIznos: e.target.value })}
                   className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required />
+              </div>
+              <div>
+                <label className="text-slate-400 text-sm mb-1 block">Rok za prikupljanje (opciono)</label>
+                <input type="date" min={new Date().toISOString().slice(0, 10)} value={form.rok}
+                  onChange={e => setForm({ ...form, rok: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" />
               </div>
               <div>
                 <label className="text-slate-400 text-sm mb-1 block">Pozovi članove (opciono)</label>
