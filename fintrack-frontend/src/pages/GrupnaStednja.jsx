@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import { Plus, Users } from 'lucide-react'
+import { useCurrency } from '../context/CurrencyContext'
 
 export default function GrupnaStednja() {
   const [grupe, setGrupe] = useState([])
@@ -9,6 +10,7 @@ export default function GrupnaStednja() {
   const [selectedGrupa, setSelectedGrupa] = useState(null)
   const [form, setForm] = useState({ naziv: '', ciljIznos: '', clanovi: '' })
   const [uplataForm, setUplataForm] = useState({ iznosUdela: '', datumUplate: '' })
+  const { currency, formatMoney } = useCurrency()
 
   useEffect(() => { fetchGrupe() }, [])
 
@@ -63,11 +65,11 @@ export default function GrupnaStednja() {
         </div>
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupno prikupljeno</p>
-          <p className="text-amber-400 text-2xl font-bold">{ukupnoPrikupljeno.toLocaleString()} RSD</p>
+          <p className="text-amber-400 text-2xl font-bold">{formatMoney(ukupnoPrikupljeno)}</p>
         </div>
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupni cilj</p>
-          <p className="text-white text-2xl font-bold">{ukupniCilj.toLocaleString()} RSD</p>
+          <p className="text-white text-2xl font-bold">{formatMoney(ukupniCilj)}</p>
         </div>
       </div>
 
@@ -91,7 +93,7 @@ export default function GrupnaStednja() {
                 <div className="h-2 rounded-full bg-amber-500 transition-all" style={{ width: `${procenat}%` }} />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 text-sm">{parseFloat(g.trenutnoPrikupljeno || 0).toLocaleString()} / {parseFloat(g.ciljIznos).toLocaleString()} RSD</span>
+                <span className="text-slate-500 text-sm">{formatMoney(parseFloat(g.trenutnoPrikupljeno || 0))} / {formatMoney(parseFloat(g.ciljIznos))}</span>
                 <div className="flex items-center gap-1">
                   <Users size={13} className="text-slate-500" />
                   <span className="text-slate-500 text-xs">{g.clanovi?.length || 0} članova</span>
@@ -113,7 +115,7 @@ export default function GrupnaStednja() {
                   className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required />
               </div>
               <div>
-                <label className="text-slate-400 text-sm mb-1 block">Ciljni iznos (RSD)</label>
+                <label className="text-slate-400 text-sm mb-1 block">Ciljni iznos ({currency})</label>
                 <input type="number" value={form.ciljIznos} onChange={e => setForm({ ...form, ciljIznos: e.target.value })}
                   className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required />
               </div>
@@ -138,7 +140,7 @@ export default function GrupnaStednja() {
             <p className="text-slate-400 text-sm mb-4">{selectedGrupa?.naziv}</p>
             <form onSubmit={handleUplata} className="flex flex-col gap-4">
               <div>
-                <label className="text-slate-400 text-sm mb-1 block">Iznos (RSD)</label>
+                <label className="text-slate-400 text-sm mb-1 block">Iznos ({currency})</label>
                 <input type="number" value={uplataForm.iznosUdela} onChange={e => setUplataForm({ ...uplataForm, iznosUdela: e.target.value })}
                   className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required />
               </div>

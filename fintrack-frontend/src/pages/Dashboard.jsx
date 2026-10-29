@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useCurrency } from '../context/CurrencyContext'
 import { Plus, TrendingUp, TrendingDown, Star, Trophy } from 'lucide-react'
 import api from '../api/axios'
 import { Link } from 'react-router-dom'
@@ -11,9 +12,8 @@ export default function Dashboard() {
   const [profil, setProfil] = useState(null)
   const [transakcije, setTransakcije] = useState([])
   const [limiti, setLimiti] = useState([])
-  const [kurs, setKurs] = useState(1)
-  const [valuta, setValuta] = useState('RSD')
   const [loading, setLoading] = useState(true)
+  const { formatMoney } = useCurrency()
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -27,14 +27,6 @@ export default function Dashboard() {
         setLimiti(lRes.data.data || lRes.data)
         setProfil(pRes.data)
 
-        const prefValuta = pRes.data.preferred_currency || 'RSD'
-        setValuta(prefValuta)
-
-        if (prefValuta !== 'RSD') {
-          const kursRes = await api.post('/konvertuj', { iznos: 1, iz_valute: 'RSD', u_valutu: prefValuta })
-          setKurs(kursRes.data.konvertovani_iznos)
-        }
-
         if (isPremium()) {
           const nwRes = await api.get('/net-worth')
           setData(nwRes.data)
@@ -44,8 +36,6 @@ export default function Dashboard() {
     }
     fetchAll()
   }, [])
-
-  const konvertuj = (iznos) => (iznos * kurs).toLocaleString(undefined, { maximumFractionDigits: 2 })
 
   const prihodi = transakcije.filter(t => t.kategorija?.tip === 'prihod').reduce((s, t) => s + parseFloat(t.kolicina), 0)
   const troskovi = transakcije.filter(t => t.kategorija?.tip === 'trosak').reduce((s, t) => s + parseFloat(t.kolicina), 0)
@@ -90,20 +80,20 @@ export default function Dashboard() {
         {isPremium() && (
           <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
             <p className="text-slate-500 text-xs mb-1">Net worth</p>
-            <p className="text-white text-2xl font-bold">{konvertuj(data?.net_worth || 0)} {valuta}</p>
+            <p className="text-white text-2xl font-bold">{formatMoney(data?.net_worth || 0)}</p>
           </div>
         )}
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupni prihodi</p>
-          <p className="text-green-400 text-2xl font-bold">{konvertuj(prihodi)} {valuta}</p>
+          <p className="text-green-400 text-2xl font-bold">{formatMoney(prihodi, { sign: true })}</p>
         </div>
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupni troškovi</p>
-          <p className="text-red-400 text-2xl font-bold">{konvertuj(troskovi)} {valuta}</p>
+          <p className="text-red-400 text-2xl font-bold">{formatMoney(-troskovi, { sign: true })}</p>
         </div>
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Bilans meseca</p>
-          <p className={`text-2xl font-bold ${bilans >= 0 ? 'text-white' : 'text-red-400'}`}>{konvertuj(bilans)} {valuta}</p>
+          <p className={`text-2xl font-bold ${bilans >= 0 ? 'text-white' : 'text-red-400'}`}>{formatMoney(bilans, { sign: true })}</p>
           <p className="text-slate-500 text-xs mt-1">{bilans >= 0 ? 'Pozitivan bilans' : 'Negativan bilans'}</p>
         </div>
       </div>
@@ -126,7 +116,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <span className={`text-sm font-medium ${t.kategorija?.tip === 'prihod' ? 'text-green-400' : 'text-red-400'}`}>
-                  {t.kategorija?.tip === 'prihod' ? '+' : '-'}{konvertuj(parseFloat(t.kolicina))} {valuta}
+                  {formatMoney(t.kategorija?.tip === 'prihod' ? parseFloat(t.kolicina) : -parseFloat(t.kolicina), { sign: true })}
                 </span>
               </div>
             ))}
@@ -147,7 +137,7 @@ export default function Dashboard() {
                 <div key={l.id}>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-slate-300">{l.kategorija?.naziv}</span>
-                    <span className="text-slate-400">{konvertuj(potroseno)} / {konvertuj(parseFloat(l.iznos))} {valuta}</span>
+                    <span className="text-slate-400">{formatMoney(potroseno)} / {formatMoney(parseFloat(l.iznos))}</span>
                   </div>
                   <div className="h-2 bg-white/5 rounded-full">
                     <div

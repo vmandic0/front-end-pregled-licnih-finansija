@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import { Plus, Trash2, Pencil } from 'lucide-react'
+import { useCurrency } from '../context/CurrencyContext'
 
 export default function Limiti() {
   const [limiti, setLimiti] = useState([])
@@ -9,6 +10,7 @@ export default function Limiti() {
   const [showModal, setShowModal] = useState(false)
   const [editLimit, setEditLimit] = useState(null)
   const [form, setForm] = useState({ kategorija_id: '', iznos: '' })
+  const { currency, formatMoney } = useCurrency()
 
   useEffect(() => { fetchAll() }, [])
 
@@ -73,7 +75,7 @@ export default function Limiti() {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <p className="text-white font-medium">{l.kategorija?.naziv}</p>
-                  <p className="text-slate-500 text-sm">Limit: {parseFloat(l.iznos).toLocaleString()} RSD</p>
+                  <p className="text-slate-500 text-sm">Limit: {formatMoney(parseFloat(l.iznos))}</p>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => openEdit(l)} className="text-slate-500 hover:text-amber-400 transition"><Pencil size={15} /></button>
@@ -81,7 +83,7 @@ export default function Limiti() {
                 </div>
               </div>
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-slate-400">Potrošeno: {potroseno.toLocaleString()} RSD</span>
+                <span className="text-slate-400">Potrošeno: {formatMoney(potroseno)}</span>
                 <span className={procenat >= 100 ? 'text-red-400' : procenat >= 80 ? 'text-amber-400' : 'text-green-400'}>
                   {procenat.toFixed(0)}%
                 </span>
@@ -122,7 +124,7 @@ export default function Limiti() {
                 </div>
               )}
               <div>
-                <label className="text-slate-400 text-sm mb-1 block">Iznos limita (RSD)</label>
+                <label className="text-slate-400 text-sm mb-1 block">Iznos limita ({currency})</label>
                 <input
                   type="number"
                   value={form.iznos}

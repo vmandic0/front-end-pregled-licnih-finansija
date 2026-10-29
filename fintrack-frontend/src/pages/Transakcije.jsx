@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
+import { useCurrency } from '../context/CurrencyContext'
 import { Plus, Search, Trash2 } from 'lucide-react'
 
 export default function Transakcije() {
@@ -19,35 +20,24 @@ export default function Transakcije() {
     interval_vrednost: 1,
   })
   const [poruka, setPoruka] = useState('')
-  const [kurs, setKurs] = useState(1)
-  const [valuta, setValuta] = useState('RSD')
+  const { currency, formatMoney } = useCurrency()
 
   useEffect(() => { fetchAll() }, [])
 
   const fetchAll = async () => {
     try {
-      const [tRes, kRes, pRes, rRes] = await Promise.all([
+      const [tRes, kRes, rRes] = await Promise.all([
         api.get('/transakcije'),
         api.get('/kategorije'),
-        api.get('/profil'),
         api.get('/ponavljajuce-transakcije'),
       ])
       setTransakcije(tRes.data.data || tRes.data)
       setKategorije(kRes.data.data || kRes.data)
       setPonavljajuce(rRes.data.data || rRes.data)
 
-      const prefValuta = pRes.data.preferred_currency || 'RSD'
-      setValuta(prefValuta)
-
-      if (prefValuta !== 'RSD') {
-        const kursRes = await api.post('/konvertuj', { iznos: 1, iz_valute: 'RSD', u_valutu: prefValuta })
-        setKurs(kursRes.data.konvertovani_iznos)
-      }
     } catch {}
     setLoading(false)
   }
-
-  const konvertuj = (iznos) => (iznos * kurs).toLocaleString(undefined, { maximumFractionDigits: 2 })
 
   const handleDodaj = async (e) => {
     e.preventDefault()
@@ -156,7 +146,7 @@ export default function Transakcije() {
               <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">KATEGORIJA</th>
               <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">DATUM</th>
               <th className="text-left text-slate-500 text-xs font-medium px-4 py-3">TIP</th>
-              <th className="text-right text-slate-500 text-xs font-medium px-4 py-3">IZNOS ({valuta})</th>
+              <th className="text-right text-slate-500 text-xs font-medium px-4 py-3">IZNOS ({currency})</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
@@ -178,7 +168,7 @@ export default function Transakcije() {
                   </span>
                 </td>
                 <td className={`px-4 py-3 text-sm font-medium text-right ${t.kategorija?.tip === 'prihod' ? 'text-green-400' : 'text-red-400'}`}>
-                  {t.kategorija?.tip === 'prihod' ? '+' : '-'}{konvertuj(parseFloat(t.kolicina))}
+                  {formatMoney(t.kategorija?.tip === 'prihod' ? parseFloat(t.kolicina) : -parseFloat(t.kolicina), { sign: true })}
                 </td>
                 <td className="px-4 py-3">
                   <button onClick={() => handleObrisi(t.id)} className="text-slate-600 hover:text-red-400 transition">
@@ -211,7 +201,7 @@ export default function Transakcije() {
               {ponavljajuce.map(p => (
                 <tr key={p.id} className="border-b border-white/5">
                   <td className="px-4 py-3 text-white text-sm">{p.kategorija?.naziv}</td>
-                  <td className="px-4 py-3 text-slate-400 text-sm">{p.kolicina} RSD</td>
+                  <td className="px-4 py-3 text-slate-400 text-sm">{formatMoney(p.kolicina)}</td>
                   <td className="px-4 py-3 text-slate-400 text-sm">
                     {p.interval_vrednost > 1 ? `Svakih ${p.interval_vrednost} ${p.ucestalost === 'nedeljno' ? 'nedelja' : p.ucestalost === 'mesecno' ? 'meseci' : 'godina'}` : p.ucestalost === 'nedeljno' ? 'Jednom nedeljno' : p.ucestalost === 'mesecno' ? 'Jednom mesečno' : 'Jednom godišnje'}
                   </td>
@@ -247,7 +237,7 @@ export default function Transakcije() {
                 </select>
               </div>
               <div>
-                <label className="text-slate-400 text-sm mb-1 block">Iznos (RSD)</label>
+                <label className="text-slate-400 text-sm mb-1 block">Iznos ({currency})</label>
                 <input
                   type="number"
                   value={form.kolicina}

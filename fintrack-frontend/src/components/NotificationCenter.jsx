@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Bell, Check, X } from 'lucide-react'
 import api from '../api/axios'
+import { useCurrency } from '../context/CurrencyContext'
 
 export default function NotificationCenter() {
   const [notifications, setNotifications] = useState([])
   const [selected, setSelected] = useState(null)
   const [open, setOpen] = useState(false)
   const knownIds = useRef(new Set())
+  const { formatMoney } = useCurrency()
 
   const loadNotifications = useCallback(async (showBrowserNotification = false) => {
     try {
@@ -107,7 +109,7 @@ export default function NotificationCenter() {
             {selected.data.details && (
               <div className="mt-4 text-slate-400 text-sm space-y-1">
                 {selected.data.details.category && <p>Kategorija: {selected.data.details.category}</p>}
-                {selected.data.details.amount && <p>Iznos: {selected.data.details.amount} RSD</p>}
+                {selected.data.details.amount && <p>Iznos: {formatMoney(selected.data.details.amount)}</p>}
                 {selected.data.details.percentage && <p>Iskorišćenost limita: {selected.data.details.percentage}%</p>}
               </div>
             )}

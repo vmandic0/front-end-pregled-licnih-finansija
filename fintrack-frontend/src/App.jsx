@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { CurrencyProvider } from './context/CurrencyContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import PremiumRoute from './components/PremiumRoute'
 import AdminRoute from './components/AdminRoute'
@@ -24,8 +25,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <Routes>
+        <CurrencyProvider>
+          <BrowserRouter>
+            <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/uslovi-koriscenja" element={<TermsOfService />} />
@@ -51,8 +53,9 @@ export default function App() {
             </Route>
 
             <Route path="*" element={<Navigate to="/login" />} />
-          </Routes>
-        </BrowserRouter>
+            </Routes>
+          </BrowserRouter>
+        </CurrencyProvider>
       </AuthProvider>
     </ThemeProvider>
   )

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import api from '../api/axios'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { Download } from 'lucide-react'
+import { useCurrency } from '../context/CurrencyContext'
 
 export default function Izvestaji() {
   const [tip, setTip] = useState('mesecni')
@@ -9,6 +10,7 @@ export default function Izvestaji() {
   const [godina, setGodina] = useState(new Date().getFullYear())
   const [podaci, setPodaci] = useState(null)
   const [loading, setLoading] = useState(false)
+  const { formatMoney } = useCurrency()
 
   const fetchIzvestaj = async () => {
     setLoading(true)
@@ -174,7 +176,10 @@ export default function Izvestaji() {
               <BarChart data={chartData}>
                 <XAxis dataKey="name" stroke="#475569" tick={{ fontSize: 11 }} />
                 <YAxis stroke="#475569" tick={{ fontSize: 11 }} />
-                <Tooltip contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }} />
+                <Tooltip
+                  contentStyle={{ background: 'var(--sf)', border: '1px solid var(--bd)', borderRadius: 8 }}
+                  formatter={value => formatMoney(value)}
+                />
                 <Legend />
                 <Bar dataKey="Prihodi" fill="#22c55e" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="Troškovi" fill="#ef4444" radius={[4, 4, 0, 0]} />
@@ -187,20 +192,20 @@ export default function Izvestaji() {
             <div className="flex flex-col gap-3">
               <div className="flex justify-between py-3 border-b border-white/5">
                 <span className="text-slate-400">Ukupni prihodi</span>
-                <span className="text-green-400 font-medium">{(podaci.ukupni_prihodi || 0).toLocaleString()} RSD</span>
+                <span className="text-green-400 font-medium">{formatMoney(podaci.ukupni_prihodi || 0)}</span>
               </div>
               <div className="flex justify-between py-3 border-b border-white/5">
                 <span className="text-slate-400">Ukupni troškovi</span>
-                <span className="text-red-400 font-medium">{(podaci.ukupni_troskovi || 0).toLocaleString()} RSD</span>
+                <span className="text-red-400 font-medium">{formatMoney(-(podaci.ukupni_troskovi || 0), { sign: true })}</span>
               </div>
               <div className="flex justify-between py-3 border-b border-white/5">
                 <span className="text-slate-400">Bilans</span>
-                <span className="text-white font-medium">{(podaci.bilans || 0).toLocaleString()} RSD</span>
+                <span className="text-white font-medium">{formatMoney(podaci.bilans || 0, { sign: true })}</span>
               </div>
               {podaci.net_worth !== undefined && (
                 <div className="flex justify-between py-3">
                   <span className="text-slate-400">Net worth</span>
-                  <span className="text-amber-400 font-medium">{(podaci.net_worth || 0).toLocaleString()} RSD</span>
+                  <span className="text-amber-400 font-medium">{formatMoney(podaci.net_worth || 0)}</span>
                 </div>
               )}
             </div>

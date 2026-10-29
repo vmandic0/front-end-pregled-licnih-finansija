@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import { Plus, Trash2, Pencil, CreditCard } from 'lucide-react'
+import { useCurrency } from '../context/CurrencyContext'
 
 export default function Krediti() {
   const [krediti, setKrediti] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editKredit, setEditKredit] = useState(null)
   const [form, setForm] = useState({ pozajmljenaCifra: '', kamatnaStopa: '', mesecnaRata: '' })
+  const { currency, formatMoney } = useCurrency()
 
   useEffect(() => { fetchKrediti() }, [])
 
@@ -54,7 +56,7 @@ export default function Krediti() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Ukupan dug</p>
-          <p className="text-red-400 text-2xl font-bold">{ukupanDug.toLocaleString()} RSD</p>
+          <p className="text-red-400 text-2xl font-bold">{formatMoney(-ukupanDug, { sign: true })}</p>
         </div>
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Broj kredita</p>
@@ -62,7 +64,7 @@ export default function Krediti() {
         </div>
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Mes. obaveza</p>
-          <p className="text-white text-2xl font-bold">{mesecnaObaveza.toLocaleString()} RSD</p>
+          <p className="text-white text-2xl font-bold">{formatMoney(mesecnaObaveza)}</p>
         </div>
       </div>
 
@@ -80,7 +82,7 @@ export default function Krediti() {
                     <CreditCard size={16} className="text-amber-400" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">{parseFloat(k.pozajmljenaCifra).toLocaleString()} RSD</p>
+                    <p className="text-white font-medium">{formatMoney(parseFloat(k.pozajmljenaCifra))}</p>
                     <span className="text-xs bg-green-500/10 text-green-400 px-2 py-0.5 rounded-full">Aktivan</span>
                   </div>
                 </div>
@@ -97,7 +99,7 @@ export default function Krediti() {
                 </div>
                 <div>
                   <p className="text-slate-500 text-xs">Mes. rata</p>
-                  <p className="text-white">{parseFloat(k.mesecnaRata).toLocaleString()} RSD</p>
+                  <p className="text-white">{formatMoney(parseFloat(k.mesecnaRata))}</p>
                 </div>
                 <div>
                   <p className="text-slate-500 text-xs">Do otplate</p>
@@ -124,7 +126,7 @@ export default function Krediti() {
               {!editKredit && (
                 <>
                   <div>
-                    <label className="text-slate-400 text-sm mb-1 block">Pozajmljena cifra (RSD)</label>
+                    <label className="text-slate-400 text-sm mb-1 block">Pozajmljena cifra ({currency})</label>
                     <input type="number" value={form.pozajmljenaCifra} onChange={e => setForm({ ...form, pozajmljenaCifra: e.target.value })}
                       className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required />
                   </div>
@@ -136,7 +138,7 @@ export default function Krediti() {
                 </>
               )}
               <div>
-                <label className="text-slate-400 text-sm mb-1 block">Mesečna rata (RSD)</label>
+                <label className="text-slate-400 text-sm mb-1 block">Mesečna rata ({currency})</label>
                 <input type="number" value={form.mesecnaRata} onChange={e => setForm({ ...form, mesecnaRata: e.target.value })}
                   className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required />
               </div>

@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
@@ -26,22 +26,30 @@ export default function Sidebar() {
 
   const close = () => setOpen(false)
 
+  useEffect(() => {
+    const handleKeyDown = event => {
+      if (event.key === 'Escape') close()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   return (
     <>
       {/* Hamburger dugme, samo na mobilnom */}
       <button
         onClick={() => setOpen(!open)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-[var(--bg-card)] p-2 rounded-lg text-white"
+        className="min-[900px]:hidden fixed top-4 left-4 z-50 bg-[var(--bg-card)] p-2 rounded-lg text-white"
       >
         {open ? <X size={20} /> : <Menu size={20} />}
       </button>
 
       {/* Overlay pozadina kad je meni otvoren na mobilnom */}
       {open && (
-        <div className="md:hidden fixed inset-0 bg-black/50 z-40" onClick={close} />
+        <div className="min-[900px]:hidden fixed inset-0 bg-black/50 z-40" onClick={close} />
       )}
 
-      <aside className={`fixed top-0 left-0 h-screen w-52 bg-[var(--bg-card)] border-r border-white/5 flex flex-col py-6 px-3 z-50 transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+      <aside className={`fixed top-0 left-0 h-screen w-[232px] bg-[var(--bg-card)] border-r border-white/5 flex flex-col py-6 px-3 z-50 transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-full'} min-[900px]:translate-x-0`}>
         {/* Logo */}
         <div className="flex items-center gap-2 px-3 mb-8">
           <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center">

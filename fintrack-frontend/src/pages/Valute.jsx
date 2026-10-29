@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import { ArrowRightLeft } from 'lucide-react'
+import { useCurrency } from '../context/CurrencyContext'
 
 export default function Valute() {
   const [valute, setValute] = useState([])
@@ -9,6 +10,11 @@ export default function Valute() {
   const [loading, setLoading] = useState(false)
   const [prefVal, setPrefVal] = useState('')
   const [poruka, setPoruka] = useState('')
+  const { currency, changeCurrency, formatMoneyValue } = useCurrency()
+
+  useEffect(() => {
+    setPrefVal(currency)
+  }, [currency])
 
   useEffect(() => { fetchValute() }, [])
 
@@ -31,7 +37,7 @@ export default function Valute() {
 
   const handlePromeniValutu = async () => {
     try {
-      await api.post('/promeni-valutu', { valuta: prefVal })
+      await changeCurrency(prefVal)
       setPoruka(`Preferovana valuta promenjena na ${prefVal}`)
     } catch {}
   }
@@ -79,7 +85,7 @@ export default function Valute() {
           {rezultat && (
             <div className="mt-4 p-4 bg-white/5 rounded-lg">
               <p className="text-slate-400 text-sm">Rezultat</p>
-              <p className="text-white text-xl font-bold">{rezultat.konvertovani_iznos} {rezultat.u_valutu}</p>
+              <p className="text-white text-xl font-bold">{formatMoneyValue(rezultat.konvertovani_iznos, rezultat.u_valutu)}</p>
               <p className="text-slate-500 text-xs mt-1">Kurs: 1 {rezultat.iz_valute} = {rezultat.kurs} {rezultat.u_valutu}</p>
             </div>
           )}
@@ -93,7 +99,6 @@ export default function Valute() {
           <div className="flex gap-3">
             <select value={prefVal} onChange={e => setPrefVal(e.target.value)}
               className="flex-1 bg-white/5 border border-white/10 text-white px-3 py-3 rounded-lg outline-none focus:border-amber-500 text-sm">
-              <option value="">Izaberi valutu</option>
               {valutaOptions}
             </select>
             <button onClick={handlePromeniValutu} disabled={!prefVal}
