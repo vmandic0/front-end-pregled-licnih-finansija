@@ -76,6 +76,58 @@ select option:hover {
   background-color: #334155;
 }
 
+html:not(.dark) .text-white {
+  color: var(--tx);
+}
+
+html:not(.dark) .bg-amber-500.text-white,
+html:not(.dark) .bg-green-500.text-white,
+html:not(.dark) .bg-red-500.text-white,
+html:not(.dark) .bg-purple-500.text-white {
+  color: #FFFFFF;
+}
+
+html:not(.dark) .text-slate-300,
+html:not(.dark) .text-slate-400 {
+  color: var(--mu);
+}
+
+html:not(.dark) .text-slate-500,
+html:not(.dark) .text-slate-600 {
+  color: #71717A;
+}
+
+html:not(.dark) .bg-white\/5 {
+  background-color: rgba(17, 17, 19, .04);
+}
+
+html:not(.dark) .bg-white\/10 {
+  background-color: rgba(17, 17, 19, .07);
+}
+
+html:not(.dark) .border-white\/5 {
+  border-color: var(--bd);
+}
+
+html:not(.dark) .border-white\/10 {
+  border-color: #D4D4D8;
+}
+
+html:not(.dark) .hover\:bg-white\/5:hover {
+  background-color: rgba(17, 17, 19, .07);
+}
+
+html:not(.dark) select option {
+  color: var(--tx);
+  background-color: var(--sf);
+}
+
+html:not(.dark) select option:checked,
+html:not(.dark) select option:hover {
+  color: var(--tx);
+  background-color: var(--el);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
