@@ -51,10 +51,6 @@ api.interceptors.request.use(async (config) => {
   }
 
   config.headers = config.headers || {}
-  const token = window.localStorage.getItem('fintrack_token')
-  if (token && !config.headers.Authorization) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
   if (csrfToken && !config.headers['X-CSRF-TOKEN']) {
     config.headers['X-CSRF-TOKEN'] = csrfToken
   }
