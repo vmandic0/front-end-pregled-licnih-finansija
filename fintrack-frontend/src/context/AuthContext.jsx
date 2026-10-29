@@ -40,7 +40,8 @@ export function AuthProvider({ children }) {
     initialCheckController.current?.abort()
     await ensureCsrfCookie()
     const res = await api.post('/login', { email, password })
-    const { user } = res.data
+    const { user, token } = res.data
+    window.localStorage.setItem('fintrack_token', token)
     authChangedDuringInitialCheck.current = true
     setUser(user)
     return user
@@ -50,6 +51,7 @@ export function AuthProvider({ children }) {
     initialCheckController.current?.abort()
     await ensureCsrfCookie()
     const res = await api.post('/register', { name, email, password, password_confirmation })
+    window.localStorage.setItem('fintrack_token', res.data.token)
     authChangedDuringInitialCheck.current = true
     setUser(res.data.user)
     return res.data
@@ -62,6 +64,7 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error('Odjava sa servera nije uspela.', error)
     } finally {
+      window.localStorage.removeItem('fintrack_token')
       setUser(null)
     }
   }
