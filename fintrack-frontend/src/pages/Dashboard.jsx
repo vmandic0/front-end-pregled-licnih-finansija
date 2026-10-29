@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { Plus, TrendingUp, TrendingDown, Star, Trophy } from 'lucide-react'
 import api from '../api/axios'
 import { Link } from 'react-router-dom'
+import NotificationCenter from '../components/NotificationCenter'
 
 export default function Dashboard() {
   const { user, isPremium } = useAuth()
@@ -71,7 +72,8 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          <NotificationCenter />
           {isPremium() && (
             <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">
               ⭐ Premium

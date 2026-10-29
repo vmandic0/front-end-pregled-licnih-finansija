@@ -1,7 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import { Bell, Menu, X } from 'lucide-react'
-import api from '../api/axios'
+import { useState } from 'react'
+import { Menu, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import {
@@ -17,15 +16,8 @@ export default function Sidebar() {
   const { user, logout, isPremium, isAdmin } = useAuth()
   const { dark, toggleTema } = useTheme()
   const [open, setOpen] = useState(false)
-  const [obavestenja, setObavestenja] = useState([])
-  const [showObavestenja, setShowObavestenja] = useState(false)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    api.get('/obavestenja')
-      .then(({ data }) => setObavestenja(data.data || data))
-      .catch(() => {})
-  }, [])
 
   const handleLogout = async () => {
     await logout()
@@ -119,33 +111,6 @@ export default function Sidebar() {
 
         {/* User info + logout */}
         <div className="mt-auto">
-          <div className="relative mb-2">
-            <button
-              onClick={() => setShowObavestenja(value => !value)}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all"
-            >
-              <Bell size={16} />
-              Obaveštenja
-              {obavestenja.length > 0 && (
-                <span className="ml-auto bg-amber-500 text-white text-xs min-w-5 h-5 px-1 rounded-full flex items-center justify-center">
-                  {obavestenja.length}
-                </span>
-              )}
-            </button>
-            {showObavestenja && (
-              <div className="absolute bottom-full left-0 right-0 mb-2 bg-[var(--bg-card)] border border-white/10 rounded-lg p-3 shadow-xl z-50">
-                {obavestenja.length === 0 ? (
-                  <p className="text-slate-500 text-xs">Nema novih obaveštenja.</p>
-                ) : (
-                  obavestenja.map(obavestenje => (
-                    <p key={obavestenje.id} className="text-slate-300 text-xs leading-relaxed">
-                      {obavestenje.poruka}
-                    </p>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
           {/* Dark/Light toggle */}
           <button
             onClick={toggleTema}
