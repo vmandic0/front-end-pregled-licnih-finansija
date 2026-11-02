@@ -15,9 +15,8 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      const user = await login(form.email, form.password)
-      if (user.type === 'administrator') navigate('/admin')
-      else navigate('/dashboard')
+    await login(form.email, form.password)
+    navigate('/dashboard')
     } catch (err) {
       setError(err.response?.status === 419
         ? 'Sesija za prijavu je istekla. Osvežite stranicu i pokušajte ponovo.'
@@ -41,16 +40,16 @@ export default function Login() {
         </p>
         <div className="flex gap-10 text-center">
           <div>
-            <p className="text-white text-2xl font-bold">160+</p>
-            <p className="text-slate-500 text-sm">Valuta</p>
+            <p className="text-white text-2xl font-bold">Prihodi</p>
+            <p className="text-slate-500 text-sm">i troškovi</p>
           </div>
           <div>
-            <p className="text-white text-2xl font-bold">3</p>
-            <p className="text-slate-500 text-sm">Korisničke uloge</p>
+            <p className="text-white text-2xl font-bold">Mesečni</p>
+            <p className="text-slate-500 text-sm">pregled</p>
           </div>
           <div>
             <p className="text-white text-2xl font-bold">PDF</p>
-            <p className="text-slate-500 text-sm">Izvoz izveštaja</p>
+            <p className="text-slate-500 text-sm">izveštaji</p>
           </div>
         </div>
       </div>

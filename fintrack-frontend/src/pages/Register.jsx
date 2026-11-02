@@ -8,12 +8,17 @@ export default function Register() {
   const { register } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' })
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    if (!termsAccepted) {
+      setError('Morate pročitati i prihvatiti Uslove korišćenja i Politiku privatnosti.')
+      return
+    }
     if (form.password !== form.password_confirmation) {
       setError('Lozinke se ne poklapaju.')
       return
@@ -42,7 +47,7 @@ export default function Register() {
           Kreirajte besplatan nalog i počnite da pratite vaše finansije danas.
         </p>
         <div className="flex flex-col gap-3 w-full max-w-xs">
-          {['Besplatan basic nalog', 'Neograničene transakcije', 'Kategorizacija troškova'].map(f => (
+          {['Prihodi i troškovi na jednom mestu', 'Mesečni pregled finansija', 'PDF izveštaji'].map(f => (
             <div key={f} className="flex items-center gap-3">
               <Check size={16} className="text-green-400" />
               <span className="text-slate-300 text-sm">{f}</span>
@@ -112,6 +117,26 @@ export default function Register() {
                 required
               />
             </div>
+            <label className="flex items-start gap-3 text-slate-400 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={e => setTermsAccepted(e.target.checked)}
+                className="mt-0.5 accent-amber-500"
+                required
+              />
+              <span>
+                Pročitao/la sam i prihvatam{' '}
+                <Link
+                  to="/uslovi-koriscenja"
+                  className="text-amber-500 hover:underline"
+                  onClick={e => e.stopPropagation()}
+                >
+                  Uslove korišćenja i Politiku privatnosti
+                </Link>
+                .
+              </span>
+            </label>
             <button
               type="submit"
               disabled={loading}

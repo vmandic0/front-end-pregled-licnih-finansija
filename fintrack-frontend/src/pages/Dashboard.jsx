@@ -6,12 +6,26 @@ import api from '../api/axios'
 import { Link } from 'react-router-dom'
 import NotificationCenter from '../components/NotificationCenter'
 
+function getCurrentMonth() {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+}
+
+function formatMonth(month) {
+  const [year, monthNumber] = month.split('-')
+  return new Intl.DateTimeFormat('sr-Latn-RS', {
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(Number(year), Number(monthNumber) - 1, 1))
+}
+
 export default function Dashboard() {
   const { user, isPremium } = useAuth()
   const [data, setData] = useState(null)
   const [profil, setProfil] = useState(null)
   const [transakcije, setTransakcije] = useState([])
   const [limiti, setLimiti] = useState([])
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth)
   const [loading, setLoading] = useState(true)
   const { formatMoney } = useCurrency()
 
@@ -37,10 +51,17 @@ export default function Dashboard() {
     fetchAll()
   }, [])
 
+  const mesecneTransakcije = transakcije.filter(t => t.datum?.slice(0, 7) === selectedMonth)
   const prihodi = transakcije.filter(t => t.kategorija?.tip === 'prihod').reduce((s, t) => s + parseFloat(t.kolicina), 0)
   const troskovi = transakcije.filter(t => t.kategorija?.tip === 'trosak').reduce((s, t) => s + parseFloat(t.kolicina), 0)
+  const mesecniPrihodi = mesecneTransakcije
+    .filter(t => t.kategorija?.tip === 'prihod')
+    .reduce((s, t) => s + parseFloat(t.kolicina), 0)
+  const mesecniTroskovi = mesecneTransakcije
+    .filter(t => t.kategorija?.tip === 'trosak')
+    .reduce((s, t) => s + parseFloat(t.kolicina), 0)
   const bilans = prihodi - troskovi
-  const poslednje = [...transakcije].slice(0, 5)
+  const poslednje = [...mesecneTransakcije].slice(0, 5)
 
   if (loading) return <div className="text-slate-400 p-8">Učitavanje...</div>
 
@@ -62,7 +83,16 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          <label className="flex items-center gap-2 text-slate-400 text-sm">
+            <span className="sr-only">Izaberite mesec</span>
+            <input
+              type="month"
+              value={selectedMonth}
+              onChange={e => setSelectedMonth(e.target.value)}
+              className="bg-[var(--bg-card)] border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
+            />
+          </label>
           <NotificationCenter />
           {isPremium() && (
             <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">
@@ -79,20 +109,20 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {isPremium() && (
           <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
-            <p className="text-slate-500 text-xs mb-1">Net worth</p>
+            <p className="text-slate-500 text-xs mb-1">Ukupan net worth</p>
             <p className="text-white text-2xl font-bold">{formatMoney(data?.net_worth || 0)}</p>
           </div>
         )}
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
-          <p className="text-slate-500 text-xs mb-1">Ukupni prihodi</p>
-          <p className="text-green-400 text-2xl font-bold">{formatMoney(prihodi, { sign: true })}</p>
+          <p className="text-slate-500 text-xs mb-1">Prihodi · {formatMonth(selectedMonth)}</p>
+          <p className="text-green-400 text-2xl font-bold">{formatMoney(mesecniPrihodi, { sign: true })}</p>
         </div>
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
-          <p className="text-slate-500 text-xs mb-1">Ukupni troškovi</p>
-          <p className="text-red-400 text-2xl font-bold">{formatMoney(-troskovi, { sign: true })}</p>
+          <p className="text-slate-500 text-xs mb-1">Troškovi · {formatMonth(selectedMonth)}</p>
+          <p className="text-red-400 text-2xl font-bold">{formatMoney(-mesecniTroskovi, { sign: true })}</p>
         </div>
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
-          <p className="text-slate-500 text-xs mb-1">Bilans meseca</p>
+          <p className="text-slate-500 text-xs mb-1">Ukupni bilans</p>
           <p className={`text-2xl font-bold ${bilans >= 0 ? 'text-white' : 'text-red-400'}`}>{formatMoney(bilans, { sign: true })}</p>
           <p className="text-slate-500 text-xs mt-1">{bilans >= 0 ? 'Pozitivan bilans' : 'Negativan bilans'}</p>
         </div>
@@ -101,7 +131,8 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Poslednje transakcije */}
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
-          <p className="text-white font-medium mb-4">Poslednje transakcije</p>
+          <p className="text-white font-medium mb-1">Transakcije · {formatMonth(selectedMonth)}</p>
+          <p className="text-slate-500 text-xs mb-4">Prikaz transakcija za izabrani mesec</p>
           <div className="flex flex-col gap-3">
             {poslednje.length === 0 && <p className="text-slate-500 text-sm">Nema transakcija</p>}
             {poslednje.map(t => (
@@ -129,7 +160,7 @@ export default function Dashboard() {
           <div className="flex flex-col gap-4">
             {limiti.length === 0 && <p className="text-slate-500 text-sm">Nema postavljenih limita</p>}
             {limiti.map(l => {
-              const potroseno = transakcije
+              const potroseno = mesecneTransakcije
                 .filter(t => t.kategorija_id === l.kategorija_id)
                 .reduce((s, t) => s + parseFloat(t.kolicina), 0)
               const procenat = Math.min((potroseno / l.iznos) * 100, 100)
