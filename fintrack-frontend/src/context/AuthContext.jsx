@@ -46,10 +46,16 @@ export function AuthProvider({ children }) {
     return user
   }
 
-  const register = async (name, email, password, password_confirmation) => {
+  const register = async (name, email, password, password_confirmation, ageConfirmed) => {
     initialCheckController.current?.abort()
     await ensureCsrfCookie()
-    const res = await api.post('/register', { name, email, password, password_confirmation })
+    const res = await api.post('/register', {
+      name,
+      email,
+      password,
+      password_confirmation,
+      age_confirmed: ageConfirmed,
+    })
     authChangedDuringInitialCheck.current = true
     setUser(res.data.user)
     return res.data

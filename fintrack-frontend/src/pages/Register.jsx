@@ -9,6 +9,7 @@ export default function Register() {
   const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' })
   const [termsAccepted, setTermsAccepted] = useState(false)
+  const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -19,13 +20,17 @@ export default function Register() {
       setError('Morate pročitati i prihvatiti Uslove korišćenja i Politiku privatnosti.')
       return
     }
+    if (!ageConfirmed) {
+      setError('Morate potvrditi da imate najmanje 16 godina.')
+      return
+    }
     if (form.password !== form.password_confirmation) {
       setError('Lozinke se ne poklapaju.')
       return
     }
     setLoading(true)
     try {
-      await register(form.name, form.email, form.password, form.password_confirmation)
+      await register(form.name, form.email, form.password, form.password_confirmation, true)
       navigate('/dashboard')
     } catch (err) {
       setError(err.response?.data?.message || 'Greška pri registraciji.')
@@ -117,8 +122,9 @@ export default function Register() {
                 required
               />
             </div>
-            <label className="flex items-start gap-3 text-slate-400 text-sm cursor-pointer">
+            <label htmlFor="terms-accepted" className="flex items-start gap-3 text-slate-400 text-sm cursor-pointer">
               <input
+                id="terms-accepted"
                 type="checkbox"
                 checked={termsAccepted}
                 onChange={e => setTermsAccepted(e.target.checked)}
@@ -137,6 +143,17 @@ export default function Register() {
                 .
               </span>
             </label>
+            <label htmlFor="age-confirmed" className="flex items-start gap-3 text-slate-400 text-sm cursor-pointer">
+              <input
+                id="age-confirmed"
+                type="checkbox"
+                checked={ageConfirmed}
+                onChange={e => setAgeConfirmed(e.target.checked)}
+                className="mt-0.5 accent-amber-500"
+                required
+              />
+              <span>Potvrđujem da imam najmanje 16 godina.</span>
+            </label>
             <button
               type="submit"
               disabled={loading}
@@ -151,12 +168,6 @@ export default function Register() {
             <Link to="/login" className="text-amber-500 hover:underline">Prijavite se</Link>
           </p>
 
-          <p className="text-slate-600 text-xs text-center mt-4">
-            Registracijom prihvatate{' '}
-            <Link to="/uslovi-koriscenja" className="text-slate-400 hover:text-amber-500 hover:underline">
-              Uslove korišćenja i Politiku privatnosti
-            </Link>
-          </p>
         </div>
       </div>
     </div>

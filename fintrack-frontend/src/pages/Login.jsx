@@ -40,8 +40,8 @@ export default function Login() {
         </p>
         <div className="flex gap-10 text-center">
           <div>
-            <p className="text-white text-2xl font-bold">Prihodi</p>
-            <p className="text-slate-500 text-sm">i troškovi</p>
+            <p className="text-white text-2xl font-bold">Prihodi i troškovi</p>
+            <p className="text-slate-500 text-sm">na jednom mestu</p>
           </div>
           <div>
             <p className="text-white text-2xl font-bold">Mesečni</p>

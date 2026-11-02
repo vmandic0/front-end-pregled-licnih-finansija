@@ -5,18 +5,12 @@ import { Plus, TrendingUp, TrendingDown, Star, Trophy } from 'lucide-react'
 import api from '../api/axios'
 import { Link } from 'react-router-dom'
 import NotificationCenter from '../components/NotificationCenter'
+import MonthPicker from '../components/MonthPicker'
+import { formatMonth } from '../utils/date'
 
 function getCurrentMonth() {
   const now = new Date()
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-}
-
-function formatMonth(month) {
-  const [year, monthNumber] = month.split('-')
-  return new Intl.DateTimeFormat('sr-Latn-RS', {
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(Number(year), Number(monthNumber) - 1, 1))
 }
 
 export default function Dashboard() {
@@ -62,6 +56,10 @@ export default function Dashboard() {
     .reduce((s, t) => s + parseFloat(t.kolicina), 0)
   const bilans = prihodi - troskovi
   const poslednje = [...mesecneTransakcije].slice(0, 5)
+  const oldestMonth = transakcije
+    .map(t => t.datum?.slice(0, 7))
+    .filter(Boolean)
+    .sort()[0]
 
   if (loading) return <div className="text-slate-400 p-8">Učitavanje...</div>
 
@@ -84,15 +82,7 @@ export default function Dashboard() {
           )}
         </div>
         <div className="flex items-center gap-2 flex-wrap justify-end">
-          <label className="flex items-center gap-2 text-slate-400 text-sm">
-            <span className="sr-only">Izaberite mesec</span>
-            <input
-              type="month"
-              value={selectedMonth}
-              onChange={e => setSelectedMonth(e.target.value)}
-              className="bg-[var(--bg-card)] border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
-            />
-          </label>
+          <MonthPicker value={selectedMonth} onChange={setSelectedMonth} oldestMonth={oldestMonth} />
           <NotificationCenter />
           {isPremium() && (
             <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">

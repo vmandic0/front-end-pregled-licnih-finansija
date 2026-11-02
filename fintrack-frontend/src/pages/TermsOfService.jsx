@@ -25,7 +25,7 @@ export default function TermsOfService() {
         </button>
 
         <h1 className="text-white text-3xl font-bold mb-1">Uslovi korišćenja i Autorska prava</h1>
-        <p className="text-slate-500 text-sm mb-10">Poslednje ažurirano: 10.08.2026</p>
+        <p className="text-slate-500 text-sm mb-10">Poslednje ažurirano: 02.11.2026</p>
 
         {/* <p className="text-slate-400 text-sm bg-white/5 border border-white/10 rounded-lg px-4 py-3 mb-10">
           Ovo je opšti tekst pripremljen za studentski/portfolio projekat i ne predstavlja pravni savet advokata.
@@ -93,6 +93,12 @@ export default function TermsOfService() {
             'Korisnik u svakom trenutku može zatražiti brisanje svog naloga i podataka.',
             'Aplikacija koristi standardne mere zaštite (autentifikacija, enkriptovana komunikacija) u meri u kojoj to dozvoljava infrastruktura na kojoj je hostovana.',
           ]} />
+        </Section>
+
+        <Section title="Uzrast korisnika">
+          <P>
+            Aplikaciju mogu koristiti samo osobe koje imaju najmanje 16 godina. Registracijom potvrđujete da ispunjavate ovaj uslov. Ako se utvrdi da je nalog otvorila osoba mlađa od 16 godina, nalog može biti obrisan.
+          </P>
         </Section>
 
         <Section title="Autorska prava (Copyright)">

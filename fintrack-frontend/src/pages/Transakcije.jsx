@@ -9,6 +9,8 @@ export default function Transakcije() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filterKat, setFilterKat] = useState('')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [ponavljajuce, setPonavljajuce] = useState([])
   const [form, setForm] = useState({
@@ -85,8 +87,20 @@ export default function Transakcije() {
   const filtered = transakcije.filter(t => {
     const matchKat = filterKat ? t.kategorija_id == filterKat : true
     const matchSearch = search ? t.kategorija?.naziv?.toLowerCase().includes(search.toLowerCase()) : true
-    return matchKat && matchSearch
+    const datesValid = !dateFrom || !dateTo || dateFrom <= dateTo
+    const matchDateFrom = !datesValid || !dateFrom || t.datum >= dateFrom
+    const matchDateTo = !datesValid || !dateTo || t.datum <= dateTo
+    return matchKat && matchSearch && matchDateFrom && matchDateTo
   })
+  const invalidDateRange = dateFrom && dateTo && dateFrom > dateTo
+  const hasActiveFilters = search || filterKat || dateFrom || dateTo
+
+  const clearFilters = () => {
+    setSearch('')
+    setFilterKat('')
+    setDateFrom('')
+    setDateTo('')
+  }
 
   const prihodi = transakcije.filter(t => t.kategorija?.tip === 'prihod').reduce((s, t) => s + parseFloat(t.kolicina), 0)
   const troskovi = transakcije.filter(t => t.kategorija?.tip === 'trosak').reduce((s, t) => s + parseFloat(t.kolicina), 0)
@@ -124,7 +138,7 @@ export default function Transakcije() {
 
       {/* Filteri */}
       <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4 mb-4">
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
@@ -142,7 +156,40 @@ export default function Transakcije() {
             <option value="">Sve kategorije</option>
             {kategorije.map(k => <option key={k.id} value={k.id}>{k.naziv}</option>)}
           </select>
+          <label className="flex items-center gap-2 text-slate-400 text-sm">
+            <span>Od</span>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={e => setDateFrom(e.target.value)}
+              aria-label="Od"
+              className="bg-white/5 border border-white/10 text-white px-3 py-2 rounded-lg text-sm outline-none focus:border-amber-500"
+            />
+          </label>
+          <label className="flex items-center gap-2 text-slate-400 text-sm">
+            <span>Do</span>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={e => setDateTo(e.target.value)}
+              aria-label="Do"
+              className="bg-white/5 border border-white/10 text-white px-3 py-2 rounded-lg text-sm outline-none focus:border-amber-500"
+            />
+          </label>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="text-slate-400 hover:text-white border border-white/10 px-3 py-2 rounded-lg text-sm transition"
+            >
+              Očisti filtere
+            </button>
+          )}
         </div>
+        {invalidDateRange && (
+          <p className="text-red-400 text-sm mt-3">Datum 'Od' ne može biti posle datuma 'Do'.</p>
+        )}
+        <p className="text-slate-500 text-sm mt-3">Prikazano {filtered.length} od {transakcije.length} transakcija</p>
       </div>
 
       {/* Tabela */}
