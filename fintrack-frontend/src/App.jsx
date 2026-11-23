@@ -40,6 +40,7 @@ export default function App() {
               <Route path="/limiti" element={<Limiti />} />
               <Route path="/valute" element={<Valute />} />
               <Route path="/subskripcije" element={<Subskripcije />} />
+              <Route path="/pretplate" element={<Subskripcije />} />
 
               <Route element={<PremiumRoute />}>
                 <Route path="/krediti" element={<Krediti />} />

@@ -76,8 +76,8 @@ export default function Sidebar() {
           <NavLink to="/limiti" onClick={close} className={({ isActive }) => isActive ? activeItem : navItem}>
             <Sliders size={16} /> Limiti
           </NavLink>
-          <NavLink to="/subskripcije" onClick={close} className={({ isActive }) => isActive ? activeItem : navItem}>
-            <Repeat2 size={16} /> Subskripcije
+          <NavLink to="/pretplate" onClick={close} className={({ isActive }) => isActive ? activeItem : navItem}>
+            <Repeat2 size={16} /> Pretplate
           </NavLink>
           <NavLink to="/valute" onClick={close} className={({ isActive }) => isActive ? activeItem : navItem}>
             <Globe size={16} /> Valute

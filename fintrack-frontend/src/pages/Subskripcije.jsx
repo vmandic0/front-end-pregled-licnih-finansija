@@ -6,7 +6,7 @@ const emptyForm = {
   naziv: '',
   iznos: '',
   valuta: 'EUR',
-  dan_naplate: 1,
+  datum_naplate: new Date().toISOString().slice(0, 10),
   kategorija_id: '',
   aktivna: true,
 }
@@ -34,7 +34,14 @@ export default function Subskripcije() {
       ])
       setSubskripcije(sRes.data.data || sRes.data)
       setPopularne(pRes.data)
-      setKategorije((kRes.data.data || kRes.data).filter(k => k.tip === 'trosak'))
+      const troskovi = (kRes.data.data || kRes.data).filter(k => k.tip === 'trosak')
+      setKategorije(troskovi)
+      if (!editId) {
+        setForm(current => ({
+          ...current,
+          kategorija_id: current.kategorija_id || String(troskovi.find(k => k.naziv === 'Pretplate')?.id || ''),
+        }))
+      }
       setValute(vRes.data.valute || vRes.data)
     } catch {
       setPoruka('Nije moguće učitati subskripcije.')
@@ -44,7 +51,12 @@ export default function Subskripcije() {
   const openAdd = () => {
     setEditId(null)
     setCustomName(false)
-    setForm(emptyForm)
+    const pretplataId = kategorije.find(k => k.naziv === 'Pretplate')?.id
+    setForm({
+      ...emptyForm,
+      datum_naplate: new Date().toISOString().slice(0, 10),
+      kategorija_id: pretplataId ? String(pretplataId) : '',
+    })
     setPoruka('')
     setShowModal(true)
   }
@@ -56,7 +68,7 @@ export default function Subskripcije() {
       naziv: sub.naziv,
       iznos: sub.iznos,
       valuta: sub.valuta,
-      dan_naplate: sub.dan_naplate,
+      datum_naplate: sub.sledeci_datum?.slice(0, 10) || new Date().toISOString().slice(0, 10),
       kategorija_id: sub.kategorija_id,
       aktivna: sub.aktivna,
     })
@@ -104,9 +116,9 @@ export default function Subskripcije() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-white text-2xl font-bold">Subskripcije</h1>
+        <h1 className="text-white text-2xl font-bold">Pretplate</h1>
         <button type="button" onClick={openAdd} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
-          <Plus size={16} /> Dodaj subskripciju
+          <Plus size={16} /> Dodaj pretplatu
         </button>
       </div>
 
@@ -140,7 +152,7 @@ export default function Subskripcije() {
                   {sub.iznos_u_preferiranoj_valuti} {sub.preferirana_valuta}
                 </p>
                 <p className="text-slate-500 text-xs">
-                  {sub.iznos} {sub.valuta} · naplata {sub.dan_naplate}. u mesecu
+                  {sub.iznos} {sub.valuta} · sledeća naplata {sub.sledeci_datum?.slice(0, 10)}
                 </p>
               </div>
               <span className={`text-xs px-2 py-1 rounded-full ${sub.aktivna ? 'bg-green-500/10 text-green-400' : 'bg-slate-500/10 text-slate-400'}`}>
@@ -151,7 +163,7 @@ export default function Subskripcije() {
         ))}
         {subskripcije.length === 0 && (
           <div className="md:col-span-2 xl:col-span-3 text-slate-500 text-sm bg-[var(--bg-card)] border border-white/5 rounded-xl p-6">
-            Nemate dodate subskripcije.
+            Nemate dodate pretplate.
           </div>
         )}
       </div>
@@ -159,7 +171,7 @@ export default function Subskripcije() {
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-[var(--bg-card)] border border-white/10 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h2 className="text-white font-semibold mb-4">{editId ? 'Izmeni subskripciju' : 'Nova subskripcija'}</h2>
+            <h2 className="text-white font-semibold mb-4">{editId ? 'Izmeni pretplatu' : 'Nova pretplata'}</h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div>
                 <label className="text-slate-400 text-sm mb-1 block">Naziv</label>
@@ -187,7 +199,7 @@ export default function Subskripcije() {
               </div>
               <div>
                 <label className="text-slate-400 text-sm mb-1 block">Datum naplate</label>
-                <input type="number" min="1" max="28" value={form.dan_naplate} onChange={e => setForm({ ...form, dan_naplate: e.target.value })} className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required />
+                <input type="date" value={form.datum_naplate} onChange={e => setForm({ ...form, datum_naplate: e.target.value })} className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required />
               </div>
               <div>
                 <label className="text-slate-400 text-sm mb-1 block">Kategorija troška</label>
