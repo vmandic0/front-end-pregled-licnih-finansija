@@ -20,6 +20,7 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminKorisnici from './pages/admin/AdminKorisnici'
 import AdminAnalitika from './pages/admin/AdminAnalitika'
 import TermsOfService from './pages/TermsOfService'
+import Subskripcije from './pages/Subskripcije'
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="/kategorije" element={<Kategorije />} />
               <Route path="/limiti" element={<Limiti />} />
               <Route path="/valute" element={<Valute />} />
+              <Route path="/subskripcije" element={<Subskripcije />} />
 
               <Route element={<PremiumRoute />}>
                 <Route path="/krediti" element={<Krediti />} />

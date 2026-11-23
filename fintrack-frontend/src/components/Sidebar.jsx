@@ -6,7 +6,7 @@ import { useTheme } from '../context/ThemeContext'
 import {
   LayoutDashboard, ArrowLeftRight, Tag, Sliders,
   CreditCard, FileText, Users, BarChart2,
-  Globe, LogOut, Star, PiggyBank, Sun, Moon
+  Globe, LogOut, Star, PiggyBank, Sun, Moon, Repeat2
 } from 'lucide-react'
 
 const navItem = 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all'
@@ -76,6 +76,12 @@ export default function Sidebar() {
           <NavLink to="/limiti" onClick={close} className={({ isActive }) => isActive ? activeItem : navItem}>
             <Sliders size={16} /> Limiti
           </NavLink>
+          <NavLink to="/subskripcije" onClick={close} className={({ isActive }) => isActive ? activeItem : navItem}>
+            <Repeat2 size={16} /> Subskripcije
+          </NavLink>
+          <NavLink to="/valute" onClick={close} className={({ isActive }) => isActive ? activeItem : navItem}>
+            <Globe size={16} /> Valute
+          </NavLink>
         </nav>
 
         {/* Premium */}
@@ -91,9 +97,6 @@ export default function Sidebar() {
               </NavLink>
               <NavLink to="/grupna-stednja" onClick={close} className={({ isActive }) => isActive ? activeItem : navItem}>
                 <PiggyBank size={16} /> Grupna štednja
-              </NavLink>
-              <NavLink to="/valute" onClick={close} className={({ isActive }) => isActive ? activeItem : navItem}>
-                <Globe size={16} /> Valute
               </NavLink>
             </nav>
           </>
