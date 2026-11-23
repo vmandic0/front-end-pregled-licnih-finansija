@@ -5,13 +5,13 @@ import { useAuth } from './AuthContext'
 const CurrencyContext = createContext(null)
 
 const DEFAULT_CURRENCY = 'RSD'
-const currencyDigits = currency => currency === 'RSD' ? 0 : 2
+const currencyDigits = () => 2
 
 export function formatMoneyValue(amount, currency = DEFAULT_CURRENCY, { sign = false } = {}) {
   const numericAmount = Number(amount) || 0
   const formatter = new Intl.NumberFormat('sr-RS', {
-    minimumFractionDigits: currencyDigits(currency),
-    maximumFractionDigits: currencyDigits(currency),
+    minimumFractionDigits: currencyDigits(),
+    maximumFractionDigits: currencyDigits(),
     signDisplay: sign ? 'always' : 'auto',
   })
 

@@ -47,14 +47,15 @@ export default function Dashboard() {
   }, [])
 
   const mesecneTransakcije = transakcije.filter(t => t.datum?.slice(0, 7) === selectedMonth)
-  const prihodi = transakcije.filter(t => t.kategorija?.tip === 'prihod').reduce((s, t) => s + parseFloat(t.kolicina), 0)
-  const troskovi = transakcije.filter(t => t.kategorija?.tip === 'trosak').reduce((s, t) => s + parseFloat(t.kolicina), 0)
+  const sumCents = items => items.reduce((total, item) => total + Math.round((parseFloat(item.kolicina) || 0) * 100), 0) / 100
+  const prihodi = sumCents(transakcije.filter(t => t.kategorija?.tip === 'prihod'))
+  const troskovi = sumCents(transakcije.filter(t => t.kategorija?.tip === 'trosak'))
   const mesecniPrihodi = mesecneTransakcije
     .filter(t => t.kategorija?.tip === 'prihod')
-    .reduce((s, t) => s + parseFloat(t.kolicina), 0)
+    .reduce((s, t) => s + Math.round((parseFloat(t.kolicina) || 0) * 100), 0) / 100
   const mesecniTroskovi = mesecneTransakcije
     .filter(t => t.kategorija?.tip === 'trosak')
-    .reduce((s, t) => s + parseFloat(t.kolicina), 0)
+    .reduce((s, t) => s + Math.round((parseFloat(t.kolicina) || 0) * 100), 0) / 100
   const bilans = prihodi - troskovi
   const poslednje = [...mesecneTransakcije].slice(0, 5)
   const oldestMonth = transakcije
@@ -158,7 +159,7 @@ export default function Dashboard() {
             {limiti.map(l => {
               const potroseno = mesecneTransakcije
                 .filter(t => t.kategorija_id === l.kategorija_id)
-                .reduce((s, t) => s + parseFloat(t.kolicina), 0)
+                .reduce((s, t) => s + Math.round((parseFloat(t.kolicina) || 0) * 100), 0) / 100
               const procenat = Math.min((potroseno / l.iznos) * 100, 100)
               return (
                 <div key={l.id}>

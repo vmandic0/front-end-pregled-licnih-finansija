@@ -157,7 +157,7 @@ export default function TransactionModal({ show, onClose, onSaved }) {
 
           <div>
             <label className="text-slate-400 text-sm mb-1 block">Iznos ({currency})</label>
-            <input type="number" value={form.kolicina} onChange={e => setForm({ ...form, kolicina: e.target.value })} placeholder="0" className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required />
+            <input type="number" min="0.01" step="0.01" value={form.kolicina} onChange={e => setForm({ ...form, kolicina: e.target.value })} placeholder="0.00" className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required />
           </div>
           <div>
             <label className="text-slate-400 text-sm mb-1 block">Datum</label>

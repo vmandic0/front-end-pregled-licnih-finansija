@@ -103,8 +103,9 @@ export default function Transakcije() {
     setDateTo('')
   }
 
-  const prihodi = transakcije.filter(t => t.kategorija?.tip === 'prihod').reduce((s, t) => s + parseFloat(t.kolicina), 0)
-  const troskovi = transakcije.filter(t => t.kategorija?.tip === 'trosak').reduce((s, t) => s + parseFloat(t.kolicina), 0)
+  const sumCents = items => items.reduce((total, item) => total + Math.round((parseFloat(item.kolicina) || 0) * 100), 0) / 100
+  const prihodi = sumCents(transakcije.filter(t => t.kategorija?.tip === 'prihod'))
+  const troskovi = sumCents(transakcije.filter(t => t.kategorija?.tip === 'trosak'))
 
   return (
     <div>

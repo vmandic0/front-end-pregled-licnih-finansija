@@ -53,7 +53,7 @@ export default function Limiti() {
   }
 
   const getPotroseno = (kategorija_id) =>
-    transakcije.filter(t => t.kategorija_id == kategorija_id).reduce((s, t) => s + parseFloat(t.kolicina), 0)
+    transakcije.filter(t => t.kategorija_id == kategorija_id).reduce((s, t) => s + Math.round((parseFloat(t.kolicina) || 0) * 100), 0) / 100
 
   return (
     <div>
