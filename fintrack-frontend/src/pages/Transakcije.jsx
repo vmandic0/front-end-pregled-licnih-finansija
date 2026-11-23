@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import { useCurrency } from '../context/CurrencyContext'
 import { Plus, Search, Trash2 } from 'lucide-react'
+import TransactionModal from '../components/TransactionModal'
 
 export default function Transakcije() {
   const [transakcije, setTransakcije] = useState([])
@@ -273,95 +274,11 @@ export default function Transakcije() {
         </div>
       )}
 
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[var(--bg-card)] border border-white/10 rounded-xl p-6 w-full max-w-md">
-            <h2 className="text-white font-semibold mb-4">Nova transakcija</h2>
-            <form onSubmit={handleDodaj} className="flex flex-col gap-4">
-              <div>
-                <label className="text-slate-400 text-sm mb-1 block">Kategorija</label>
-                <select
-                  value={form.kategorija_id}
-                  onChange={e => setForm({ ...form, kategorija_id: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500"
-                  required
-                >
-                  <option value="">Izaberi kategoriju</option>
-                  {kategorije.map(k => <option key={k.id} value={k.id}>{k.naziv} ({k.tip})</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-slate-400 text-sm mb-1 block">Iznos ({currency})</label>
-                <input
-                  type="number"
-                  value={form.kolicina}
-                  onChange={e => setForm({ ...form, kolicina: e.target.value })}
-                  placeholder="0"
-                  className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-slate-400 text-sm mb-1 block">Datum</label>
-                <input
-                  type="date"
-                  value={form.datum}
-                  onChange={e => setForm({ ...form, datum: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500"
-                  required
-                />
-              </div>
-              <label className="flex items-center gap-2 text-slate-300 text-sm">
-                <input
-                  type="checkbox"
-                  checked={form.ponavljaj}
-                  onChange={e => setForm({ ...form, ponavljaj: e.target.checked })}
-                  className="accent-amber-500"
-                />
-                Ponavljajuća transakcija
-              </label>
-              {form.ponavljaj && (
-                <div>
-                  <label className="text-slate-400 text-sm mb-1 block">Ponavljaj svakih</label>
-                  <div className="flex gap-2 mb-3">
-                    <input
-                      type="number"
-                      min="1"
-                      max="365"
-                      value={form.interval_vrednost}
-                      onChange={e => setForm({ ...form, interval_vrednost: e.target.value })}
-                      className="w-24 bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500"
-                      required
-                    />
-                    <span className="flex items-center text-slate-400 text-sm">
-                      {form.ucestalost === 'nedeljno' ? 'nedelja' : form.ucestalost === 'mesecno' ? 'meseci' : 'godina'}
-                    </span>
-                  </div>
-                  <label className="text-slate-400 text-sm mb-1 block">Učestalost</label>
-                  <select
-                    value={form.ucestalost}
-                    onChange={e => setForm({ ...form, ucestalost: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500"
-                  >
-                    <option value="nedeljno">Jednom nedeljno</option>
-                    <option value="mesecno">Jednom mesečno</option>
-                    <option value="godisnje">Jednom godišnje</option>
-                  </select>
-                </div>
-              )}
-              <div className="flex gap-3 mt-2">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-white/5 text-slate-300 py-3 rounded-lg hover:bg-white/10 transition">
-                  Otkaži
-                </button>
-                <button type="submit" className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition">
-                  Dodaj
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <TransactionModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        onSaved={fetchAll}
+      />
     </div>
   )
 }

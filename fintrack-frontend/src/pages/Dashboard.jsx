@@ -3,9 +3,9 @@ import { useAuth } from '../context/AuthContext'
 import { useCurrency } from '../context/CurrencyContext'
 import { Plus, TrendingUp, TrendingDown, Star, Trophy } from 'lucide-react'
 import api from '../api/axios'
-import { Link } from 'react-router-dom'
 import NotificationCenter from '../components/NotificationCenter'
 import MonthPicker from '../components/MonthPicker'
+import TransactionModal from '../components/TransactionModal'
 import { formatMonth } from '../utils/date'
 
 function getCurrentMonth() {
@@ -21,6 +21,7 @@ export default function Dashboard() {
   const [limiti, setLimiti] = useState([])
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth)
   const [loading, setLoading] = useState(true)
+  const [showTransactionModal, setShowTransactionModal] = useState(false)
   const { formatMoney } = useCurrency()
 
   useEffect(() => {
@@ -61,6 +62,11 @@ export default function Dashboard() {
     .filter(Boolean)
     .sort()[0]
 
+  const refreshTransactions = async () => {
+    const transakcijeRes = await api.get('/transakcije')
+    setTransakcije(transakcijeRes.data.data || transakcijeRes.data)
+  }
+
   if (loading) return <div className="text-slate-400 p-8">Učitavanje...</div>
 
   return (
@@ -89,9 +95,9 @@ export default function Dashboard() {
               ⭐ Premium
             </span>
           )}
-          <Link to="/transakcije" className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+          <button type="button" onClick={() => setShowTransactionModal(true)} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
             <Plus size={16} /> Nova transakcija
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -172,6 +178,12 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <TransactionModal
+        show={showTransactionModal}
+        onClose={() => setShowTransactionModal(false)}
+        onSaved={refreshTransactions}
+      />
     </div>
   )
 }

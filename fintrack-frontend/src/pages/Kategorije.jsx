@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { Plus, Trash2, Tag } from 'lucide-react'
 
 export default function Kategorije() {
-  const { isAdmin } = useAuth()
+  const { isAdmin, user } = useAuth()
   const [kategorije, setKategorije] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ naziv: '', tip: 'trosak' })
@@ -43,11 +43,9 @@ export default function Kategorije() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-white text-2xl font-bold">Kategorije</h1>
-        {isAdmin() && (
-          <button onClick={() => setShowModal(true)} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
-            <Plus size={16} /> Dodaj kategoriju
-          </button>
-        )}
+        <button onClick={() => setShowModal(true)} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+          <Plus size={16} /> Dodaj kategoriju
+        </button>
       </div>
 
       {loading ? <p className="text-slate-400">Učitavanje...</p> : (
@@ -66,7 +64,7 @@ export default function Kategorije() {
                       <span className={`text-xs px-2 py-0.5 rounded-full ${color === 'green' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                         {k.tip}
                       </span>
-                      {isAdmin() && (
+                      {(isAdmin() || k.user_id === user?.id) && (
                         <button onClick={() => handleObrisi(k.id)} className="text-slate-600 hover:text-red-400 transition">
                           <Trash2 size={14} />
                         </button>
