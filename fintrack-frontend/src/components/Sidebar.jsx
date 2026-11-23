@@ -49,7 +49,7 @@ export default function Sidebar() {
         <div className="min-[900px]:hidden fixed inset-0 bg-black/50 z-40" onClick={close} />
       )}
 
-      <aside className={`fixed top-0 left-0 h-screen w-[232px] bg-[var(--bg-card)] border-r border-white/5 flex flex-col py-6 px-3 z-50 transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-full'} min-[900px]:translate-x-0`}>
+      <aside className={`fixed top-0 left-0 h-dvh w-[232px] bg-[var(--bg-card)] border-r border-white/5 flex flex-col py-6 px-3 pb-[env(safe-area-inset-bottom)] z-50 overflow-y-auto overscroll-contain transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-full'} min-[900px]:translate-x-0`}>
         {/* Logo */}
         <div className="flex items-center gap-2 px-3 mb-8">
           <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center">
