@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import api from '../api/axios'
 import { Plus, Repeat2, Trash2, Pencil } from 'lucide-react'
 
@@ -7,6 +7,7 @@ const emptyForm = {
   iznos: '',
   valuta: 'EUR',
   datum_naplate: new Date().toISOString().slice(0, 10),
+  ucestalost: 'mesecno',
   kategorija_id: '',
   aktivna: true,
 }
@@ -21,6 +22,9 @@ export default function Subskripcije() {
   const [customName, setCustomName] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [poruka, setPoruka] = useState('')
+  const [saving, setSaving] = useState(false)
+  const savingRef = useRef(false)
+  const requestIdRef = useRef('')
 
   useEffect(() => { fetchAll() }, [])
 
@@ -69,6 +73,7 @@ export default function Subskripcije() {
       iznos: sub.iznos,
       valuta: sub.valuta,
       datum_naplate: sub.sledeci_datum?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+      ucestalost: sub.ucestalost || 'mesecno',
       kategorija_id: sub.kategorija_id,
       aktivna: sub.aktivna,
     })
@@ -78,17 +83,27 @@ export default function Subskripcije() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (savingRef.current) return
+    savingRef.current = true
+    setSaving(true)
+    if (!requestIdRef.current) {
+      requestIdRef.current = crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`
+    }
     setPoruka('')
     try {
       if (editId) {
         await api.put(`/subskripcije/${editId}`, form)
       } else {
-        await api.post('/subskripcije', form)
+        await api.post('/subskripcije', { ...form, request_id: requestIdRef.current })
       }
       setShowModal(false)
       await fetchAll()
     } catch (error) {
       setPoruka(error.response?.data?.message || 'Čuvanje subskripcije nije uspelo.')
+    } finally {
+      savingRef.current = false
+      setSaving(false)
+      requestIdRef.current = ''
     }
   }
 
@@ -152,7 +167,7 @@ export default function Subskripcije() {
                   {sub.iznos_u_preferiranoj_valuti} {sub.preferirana_valuta}
                 </p>
                 <p className="text-slate-500 text-xs">
-                  {sub.iznos} {sub.valuta} · sledeća naplata {sub.sledeci_datum?.slice(0, 10)}
+                  {sub.iznos} {sub.valuta} · {sub.ucestalost === 'godisnje' ? 'godišnja' : 'mesečna'} · sledeća naplata {sub.sledeci_datum?.slice(0, 10)}
                 </p>
               </div>
               <span className={`text-xs px-2 py-1 rounded-full ${sub.aktivna ? 'bg-green-500/10 text-green-400' : 'bg-slate-500/10 text-slate-400'}`}>
@@ -202,6 +217,13 @@ export default function Subskripcije() {
                 <input type="date" value={form.datum_naplate} onChange={e => setForm({ ...form, datum_naplate: e.target.value })} className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required />
               </div>
               <div>
+                <label className="text-slate-400 text-sm mb-1 block">Period naplate</label>
+                <select value={form.ucestalost} onChange={e => setForm({ ...form, ucestalost: e.target.value })} className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required>
+                  <option value="mesecno">Mesečno</option>
+                  <option value="godisnje">Godišnje</option>
+                </select>
+              </div>
+              <div>
                 <label className="text-slate-400 text-sm mb-1 block">Kategorija troška</label>
                 <select value={form.kategorija_id} onChange={e => setForm({ ...form, kategorija_id: e.target.value })} className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500" required>
                   <option value="">Izaberi kategoriju</option>
@@ -217,7 +239,7 @@ export default function Subskripcije() {
               {poruka && <p className="text-red-400 text-sm">{poruka}</p>}
               <div className="flex gap-3 mt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-white/5 text-slate-300 py-3 rounded-lg">Otkaži</button>
-                <button type="submit" className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg">Sačuvaj</button>
+                <button type="submit" disabled={saving} className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">{saving ? 'Čuvanje...' : 'Sačuvaj'}</button>
               </div>
             </form>
           </div>

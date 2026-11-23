@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import api from '../api/axios'
 import { Plus, Trash2, Pencil, CreditCard } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
@@ -8,6 +8,8 @@ export default function Krediti() {
   const [showModal, setShowModal] = useState(false)
   const [editKredit, setEditKredit] = useState(null)
   const [form, setForm] = useState({ pozajmljenaCifra: '', kamatnaStopa: '', mesecnaRata: '' })
+  const [saving, setSaving] = useState(false)
+  const savingRef = useRef(false)
   const { currency, formatMoney } = useCurrency()
 
   useEffect(() => { fetchKrediti() }, [])
@@ -21,6 +23,9 @@ export default function Krediti() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (savingRef.current) return
+    savingRef.current = true
+    setSaving(true)
     try {
       if (editKredit) {
         await api.patch(`/krediti/${editKredit.id}`, { mesecnaRata: form.mesecnaRata })
@@ -32,6 +37,10 @@ export default function Krediti() {
       setForm({ pozajmljenaCifra: '', kamatnaStopa: '', mesecnaRata: '' })
       fetchKrediti()
     } catch {}
+    finally {
+      savingRef.current = false
+      setSaving(false)
+    }
   }
 
   const handleObrisi = async (id) => {
@@ -144,7 +153,7 @@ export default function Krediti() {
               </div>
               <div className="flex gap-3 mt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-white/5 text-slate-300 py-3 rounded-lg hover:bg-white/10 transition">Otkaži</button>
-                <button type="submit" className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition">Sačuvaj</button>
+                <button type="submit" disabled={saving} className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50">{saving ? 'Čuvanje...' : 'Sačuvaj'}</button>
               </div>
             </form>
           </div>

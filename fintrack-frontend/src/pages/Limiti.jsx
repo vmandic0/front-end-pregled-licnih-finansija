@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import api from '../api/axios'
 import { Plus, Trash2, Pencil } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
@@ -10,6 +10,8 @@ export default function Limiti() {
   const [showModal, setShowModal] = useState(false)
   const [editLimit, setEditLimit] = useState(null)
   const [form, setForm] = useState({ kategorija_id: '', iznos: '' })
+  const [saving, setSaving] = useState(false)
+  const savingRef = useRef(false)
   const { currency, formatMoney } = useCurrency()
 
   useEffect(() => { fetchAll() }, [])
@@ -27,6 +29,9 @@ export default function Limiti() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (savingRef.current) return
+    savingRef.current = true
+    setSaving(true)
     try {
       if (editLimit) {
         await api.put(`/limiti/${editLimit.id}`, { iznos: form.iznos })
@@ -38,6 +43,10 @@ export default function Limiti() {
       setForm({ kategorija_id: '', iznos: '' })
       fetchAll()
     } catch {}
+    finally {
+      savingRef.current = false
+      setSaving(false)
+    }
   }
 
   const handleObrisi = async (id) => {
@@ -136,7 +145,7 @@ export default function Limiti() {
               </div>
               <div className="flex gap-3 mt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-white/5 text-slate-300 py-3 rounded-lg hover:bg-white/10 transition">Otkaži</button>
-                <button type="submit" className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition">Sačuvaj</button>
+                <button type="submit" disabled={saving} className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50">{saving ? 'Čuvanje...' : 'Sačuvaj'}</button>
               </div>
             </form>
           </div>

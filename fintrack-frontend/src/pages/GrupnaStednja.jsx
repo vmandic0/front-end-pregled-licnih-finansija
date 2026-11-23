@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import api from '../api/axios'
 import { Plus, Users, Search, Trash2 } from 'lucide-react'
 import { useCurrency } from '../context/CurrencyContext'
@@ -14,6 +14,8 @@ export default function GrupnaStednja() {
   const [pretraga, setPretraga] = useState('')
   const [poruka, setPoruka] = useState('')
   const [uplataForm, setUplataForm] = useState({ iznosUdela: '', datumUplate: '' })
+  const [saving, setSaving] = useState(false)
+  const savingRef = useRef(false)
   const { currency, formatMoney } = useCurrency()
 
   useEffect(() => { fetchGrupe() }, [])
@@ -42,6 +44,9 @@ export default function GrupnaStednja() {
 
   const handleKreiraj = async (e) => {
     e.preventDefault()
+    if (savingRef.current) return
+    savingRef.current = true
+    setSaving(true)
     try {
       const payload = { ...form, clanovi: izabraniClanovi }
       const { data } = await api.post('/grupe', payload)
@@ -55,7 +60,10 @@ export default function GrupnaStednja() {
     } catch (error) {
       setPoruka(error.response?.data?.message || 'Nije moguće kreirati grupu ili poslati pozive.')
     }
-
+    finally {
+      savingRef.current = false
+      setSaving(false)
+    }
   }
 
   const handleObrisiGrupu = async grupa => {
@@ -71,12 +79,19 @@ export default function GrupnaStednja() {
 
   const handleUplata = async (e) => {
     e.preventDefault()
+    if (savingRef.current) return
+    savingRef.current = true
+    setSaving(true)
     try {
       await api.post(`/grupe/${selectedGrupa.id}/uplati`, uplataForm)
       setShowUplataModal(false)
       setUplataForm({ iznosUdela: '', datumUplate: '' })
       fetchGrupe()
     } catch {}
+    finally {
+      savingRef.current = false
+      setSaving(false)
+    }
   }
 
   const ukupnoPrikupljeno = grupe.reduce((s, g) => s + parseFloat(g.trenutnoPrikupljeno || 0), 0)
@@ -212,7 +227,7 @@ export default function GrupnaStednja() {
               </div>
               <div className="flex gap-3 mt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-white/5 text-slate-300 py-3 rounded-lg hover:bg-white/10 transition">Otkaži</button>
-                <button type="submit" className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition">Kreiraj</button>
+                <button type="submit" disabled={saving} className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50">{saving ? 'Kreiranje...' : 'Kreiraj'}</button>
               </div>
             </form>
           </div>
@@ -237,7 +252,7 @@ export default function GrupnaStednja() {
               </div>
               <div className="flex gap-3 mt-2">
                 <button type="button" onClick={() => setShowUplataModal(false)} className="flex-1 bg-white/5 text-slate-300 py-3 rounded-lg hover:bg-white/10 transition">Otkaži</button>
-                <button type="submit" className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition">Uplati</button>
+                <button type="submit" disabled={saving} className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50">{saving ? 'Uplata...' : 'Uplati'}</button>
               </div>
             </form>
           </div>

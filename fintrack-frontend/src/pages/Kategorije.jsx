@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 import { Plus, Trash2, Tag } from 'lucide-react'
@@ -9,6 +9,8 @@ export default function Kategorije() {
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({ naziv: '', tip: 'trosak' })
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const savingRef = useRef(false)
 
   useEffect(() => { fetchKategorije() }, [])
 
@@ -22,12 +24,19 @@ export default function Kategorije() {
 
   const handleDodaj = async (e) => {
     e.preventDefault()
+    if (savingRef.current) return
+    savingRef.current = true
+    setSaving(true)
     try {
       await api.post('/kategorije', form)
       setShowModal(false)
       setForm({ naziv: '', tip: 'trosak' })
       fetchKategorije()
     } catch {}
+    finally {
+      savingRef.current = false
+      setSaving(false)
+    }
   }
 
   const handleObrisi = async (id) => {
@@ -108,7 +117,7 @@ export default function Kategorije() {
               </div>
               <div className="flex gap-3 mt-2">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-white/5 text-slate-300 py-3 rounded-lg hover:bg-white/10 transition">Otkaži</button>
-                <button type="submit" className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition">Dodaj</button>
+                <button type="submit" disabled={saving} className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50">{saving ? 'Dodavanje...' : 'Dodaj'}</button>
               </div>
             </form>
           </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import api from '../api/axios'
 import { useCurrency } from '../context/CurrencyContext'
 
@@ -12,6 +12,9 @@ export default function TransactionModal({ show, onClose, onSaved }) {
   const [kategorije, setKategorije] = useState([])
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [error, setError] = useState('')
+  const [saving, setSaving] = useState(false)
+  const savingRef = useRef(false)
+  const requestIdRef = useRef('')
   const [newCategory, setNewCategory] = useState({ naziv: '', tip: 'trosak' })
   const [form, setForm] = useState({
     kategorija_id: '',
@@ -65,11 +68,17 @@ export default function TransactionModal({ show, onClose, onSaved }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (savingRef.current) return
     if (form.kategorija_id === '__new__') {
       setError('Prvo sačuvajte novu kategoriju, pa tek onda dodajte transakciju.')
       return
     }
+    savingRef.current = true
+    setSaving(true)
     setError('')
+    if (!requestIdRef.current) {
+      requestIdRef.current = crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`
+    }
     try {
       const endpoint = form.ponavljaj ? '/ponavljajuce-transakcije' : '/transakcije'
       const payload = form.ponavljaj
@@ -81,7 +90,7 @@ export default function TransactionModal({ show, onClose, onSaved }) {
           sledeci_datum: form.datum,
         }
         : form
-      await api.post(endpoint, payload)
+      await api.post(endpoint, { ...payload, request_id: requestIdRef.current })
       setForm({
         kategorija_id: '',
         kolicina: '',
@@ -94,6 +103,10 @@ export default function TransactionModal({ show, onClose, onSaved }) {
       onClose()
     } catch (postError) {
       setError(postError.response?.data?.message || 'Greška pri dodavanju.')
+    } finally {
+      savingRef.current = false
+      setSaving(false)
+      requestIdRef.current = ''
     }
   }
 
@@ -187,7 +200,7 @@ export default function TransactionModal({ show, onClose, onSaved }) {
           {error && <p className="text-red-400 text-sm">{error}</p>}
           <div className="flex gap-3 mt-2">
             <button type="button" onClick={onClose} className="flex-1 bg-white/5 text-slate-300 py-3 rounded-lg hover:bg-white/10 transition">Otkaži</button>
-            <button type="submit" className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition">Dodaj</button>
+            <button type="submit" disabled={saving} className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed">{saving ? 'Dodavanje...' : 'Dodaj'}</button>
           </div>
         </form>
       </div>

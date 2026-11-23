@@ -101,7 +101,7 @@ export default function Valute() {
               className="flex-1 bg-white/5 border border-white/10 text-white px-3 py-3 rounded-lg outline-none focus:border-amber-500 text-sm">
               {valutaOptions}
             </select>
-            <button onClick={handlePromeniValutu} disabled={!prefVal}
+            <button onClick={handlePromeniValutu} disabled={!prefVal || loading}
               className="bg-amber-500 hover:bg-amber-400 text-white text-sm px-4 py-3 rounded-lg transition disabled:opacity-50">
               Sačuvaj
             </button>
