@@ -26,6 +26,16 @@ export default function TransactionModal({ show, onClose, onSaved }) {
     if (show) {
       fetchCategories()
       setError('')
+    } else {
+      setShowNewCategory(false)
+      setForm({
+        kategorija_id: '',
+        kolicina: '',
+        datum: today(),
+        ponavljaj: false,
+        ucestalost: 'mesecno',
+        interval_vrednost: 1,
+      })
     }
   }, [show])
 
@@ -55,6 +65,10 @@ export default function TransactionModal({ show, onClose, onSaved }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (form.kategorija_id === '__new__') {
+      setError('Prvo sačuvajte novu kategoriju, pa tek onda dodajte transakciju.')
+      return
+    }
     setError('')
     try {
       const endpoint = form.ponavljaj ? '/ponavljajuce-transakcije' : '/transakcije'
@@ -94,7 +108,15 @@ export default function TransactionModal({ show, onClose, onSaved }) {
             <label className="text-slate-400 text-sm mb-1 block">Kategorija</label>
             <select
               value={form.kategorija_id}
-              onChange={e => e.target.value === '__new__' ? setShowNewCategory(true) : setForm({ ...form, kategorija_id: e.target.value })}
+              onChange={e => {
+                if (e.target.value === '__new__') {
+                  setShowNewCategory(true)
+                  setForm({ ...form, kategorija_id: '__new__' })
+                } else {
+                  setShowNewCategory(false)
+                  setForm({ ...form, kategorija_id: e.target.value })
+                }
+              }}
               className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg outline-none focus:border-amber-500"
               required
             >
@@ -124,7 +146,10 @@ export default function TransactionModal({ show, onClose, onSaved }) {
                 <option value="prihod">Prihod</option>
               </select>
               <div className="flex gap-2">
-                <button type="button" onClick={() => setShowNewCategory(false)} className="flex-1 bg-white/5 text-slate-300 py-2 rounded-lg">Otkaži</button>
+                <button type="button" onClick={() => {
+                  setShowNewCategory(false)
+                  setForm(current => ({ ...current, kategorija_id: '' }))
+                }} className="flex-1 bg-white/5 text-slate-300 py-2 rounded-lg">Otkaži</button>
                 <button type="button" onClick={handleAddCategory} className="flex-1 bg-amber-500 text-white py-2 rounded-lg">Sačuvaj kategoriju</button>
               </div>
             </div>
