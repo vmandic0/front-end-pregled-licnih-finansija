@@ -15,7 +15,8 @@ function getCurrentMonth() {
 
 export default function Dashboard() {
   const { user, isPremium } = useAuth()
-  const [data, setData] = useState(null)
+  const [rezervisanaSredstva, setRezervisanaSredstva] = useState(null)
+  const [greskaRezervisanihSredstava, setGreskaRezervisanihSredstava] = useState('')
   const [profil, setProfil] = useState(null)
   const [transakcije, setTransakcije] = useState([])
   const [limiti, setLimiti] = useState([])
@@ -36,10 +37,7 @@ export default function Dashboard() {
         setLimiti(lRes.data.data || lRes.data)
         setProfil(pRes.data)
 
-        if (isPremium()) {
-          const nwRes = await api.get('/net-worth')
-          setData(nwRes.data)
-        }
+        await osveziRezervisanaSredstva()
       } catch {}
       setLoading(false)
     }
@@ -57,6 +55,8 @@ export default function Dashboard() {
     .filter(t => t.kategorija?.tip === 'trosak')
     .reduce((s, t) => s + Math.round((parseFloat(t.kolicina) || 0) * 100), 0) / 100
   const bilans = prihodi - troskovi
+  const rezervisano = Number(rezervisanaSredstva?.rezervisano)
+  const visak = Number.isFinite(rezervisano) ? bilans - rezervisano : null
   const poslednje = [...mesecneTransakcije].slice(0, 5)
   const oldestMonth = transakcije
     .map(t => t.datum?.slice(0, 7))
@@ -66,6 +66,17 @@ export default function Dashboard() {
   const refreshTransactions = async () => {
     const transakcijeRes = await api.get('/transakcije')
     setTransakcije(transakcijeRes.data.data || transakcijeRes.data)
+    await osveziRezervisanaSredstva()
+  }
+
+  const osveziRezervisanaSredstva = async () => {
+    try {
+      const response = await api.get('/rezervisana-sredstva')
+      setRezervisanaSredstva(response.data)
+      setGreskaRezervisanihSredstava('')
+    } catch {
+      setGreskaRezervisanihSredstava('Nije moguće učitati rezervisana sredstva.')
+    }
   }
 
   if (loading) return <div className="text-slate-400 p-8">Učitavanje...</div>
@@ -104,12 +115,19 @@ export default function Dashboard() {
 
       {/* Stat kartice */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {isPremium() && (
-          <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
-            <p className="text-slate-500 text-xs mb-1">Ukupan net worth</p>
-            <p className="text-white text-2xl font-bold">{formatMoney(data?.net_worth || 0)}</p>
-          </div>
-        )}
+        <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
+          <p className="text-slate-500 text-xs mb-1">Novac za ostatak meseca</p>
+          <p className="text-white text-2xl font-bold">
+            {visak === null ? '—' : formatMoney(visak, { sign: true })}
+          </p>
+          <p className="text-slate-500 text-xs mt-1">Višak nakon rezervacija</p>
+          <p className="text-amber-400 text-sm font-medium mt-3">
+            Rezervisano: {Number.isFinite(rezervisano) ? formatMoney(rezervisano) : '—'}
+          </p>
+          {greskaRezervisanihSredstava && (
+            <p className="text-red-400 text-xs mt-2">{greskaRezervisanihSredstava}</p>
+          )}
+        </div>
         <div className="bg-[var(--bg-card)] border border-white/5 rounded-xl p-4">
           <p className="text-slate-500 text-xs mb-1">Prihodi · {formatMonth(selectedMonth)}</p>
           <p className="text-green-400 text-2xl font-bold">{formatMoney(mesecniPrihodi, { sign: true })}</p>
