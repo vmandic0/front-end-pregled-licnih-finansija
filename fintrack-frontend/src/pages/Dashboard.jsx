@@ -120,7 +120,7 @@ export default function Dashboard() {
           <p className="text-white text-2xl font-bold">
             {visak === null ? '—' : formatMoney(visak, { sign: true })}
           </p>
-          <p className="text-slate-500 text-xs mt-1">Višak nakon rezervacija</p>
+          
           <p className="text-amber-400 text-sm font-medium mt-3">
             Rezervisano: {Number.isFinite(rezervisano) ? formatMoney(rezervisano) : '—'}
           </p>
